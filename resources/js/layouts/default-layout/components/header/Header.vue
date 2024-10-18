@@ -63,7 +63,7 @@ import {
                 </div>
                 <!--end::sidebar mobile toggle-->
                 <!--begin::Mobile logo-->
-                <div
+                <!-- <div
                     class="d-flex align-items-center flex-grow-1 flex-lg-grow-0"
                 >
                     <router-link to="/" class="d-lg-none">
@@ -73,7 +73,7 @@ import {
                             class="h-30px"
                         />
                     </router-link>
-                </div>
+                </div> -->
                 <!--end::Mobile logo-->
             </template>
             <!--begin::Header wrapper-->

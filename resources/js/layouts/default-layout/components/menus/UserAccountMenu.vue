@@ -86,21 +86,9 @@ const currentLangugeLocale = computed(() => {
         <!--begin::Menu item-->
         <div class="menu-item px-3">
             <div class="menu-content d-flex align-items-center px-3">
-                <!--begin::Avatar-->
-                <div class="symbol symbol-50px me-5">
-                    <img
-                        alt="Logo"
-                        :src="
-                            getAssetPath(
-                                store.user.photo ?? 'media/avatars/300-3.jpg'
-                            )
-                        "
-                    />
-                </div>
-                <!--end::Avatar-->
 
                 <!--begin::Username-->
-                <div class="d-flex flex-column">
+                <div class="d-flex flex-column mx-4">
                     <div class="fw-bold d-flex align-items-center fs-5">
                         {{ store.user.name }}
                         <span
@@ -128,7 +116,7 @@ const currentLangugeLocale = computed(() => {
         <!--begin::Menu item-->
         <div class="menu-item px-5 my-1">
             <router-link to="/dashboard/profile" class="menu-link px-5">
-                Account Settings
+                Toko Settings
             </router-link>
         </div>
         <!--end::Menu item-->

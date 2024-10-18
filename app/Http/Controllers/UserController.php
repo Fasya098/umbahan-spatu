@@ -26,6 +26,19 @@ class UserController extends Controller
         ]);
     }
 
+    public function getByid($id)
+    {
+        $base = User::find($id);
+
+        if (!$base) {
+            return response()->json([
+                'message' => 'data tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json($base);
+    }
+
     /**
      * Display a paginated list of the resource.
      */
@@ -50,10 +63,6 @@ class UserController extends Controller
     public function store(StoreUserRequest $request)
     {
         $validatedData = $request->validated();
-
-        if ($request->hasFile('photo')) {
-            $validatedData['photo'] = $request->file('photo')->store('photo', 'public');
-        }
 
         $user = User::create($validatedData);
 
@@ -84,18 +93,6 @@ class UserController extends Controller
     {
         $validatedData = $request->validated();
 
-        if ($request->hasFile('photo')) {
-            if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
-            }
-            $validatedData['photo'] = $request->file('photo')->store('photo', 'public');
-        } else {
-            if ($user->photo) {
-                Storage::disk('public')->delete($user->photo);
-                $validatedData['photo'] = null;
-            }
-        }
-
         $user->update($validatedData);
 
         $role = Role::findById($validatedData['role_id']);
@@ -112,10 +109,6 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
-        if ($user->photo) {
-            Storage::disk('public')->delete($user->photo);
-        }
-
         $user->delete();
 
         return response()->json([

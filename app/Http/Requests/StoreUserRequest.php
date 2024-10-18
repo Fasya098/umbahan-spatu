@@ -27,7 +27,7 @@ class StoreUserRequest extends FormRequest
             'email' => 'required|email|unique:users',
             'password' => ['required', 'confirmed', Password::default()],
             'phone' => 'required|unique:users',
-            'photo' => 'nullable|image',
+            // 'photo' => 'nullable|image',
             'role_id' => 'required'
         ];
     }

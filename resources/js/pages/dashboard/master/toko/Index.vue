@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { h, ref, watch } from "vue";
 import { useDelete } from "@/libs/hooks";
-import Form from "./Form.vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { User } from "@/types";
 
@@ -18,14 +17,17 @@ const columns = [
     column.accessor("no", {
         header: "#",
     }),
-    column.accessor("name", {
+    column.accessor("users.name", {
         header: "Nama",
     }),
-    column.accessor("email", {
-        header: "Email",
+    column.accessor("nama_toko", {
+        header: "Nama Toko",
     }),
-    column.accessor("phone", {
-        header: "No. Telp",
+    column.accessor("alamat", {
+        header: "Alamat",
+    }),
+    column.accessor("no_telepon", {
+        header: "No.Telp",
     }),
     column.accessor("uuid", {
         header: "Aksi",
@@ -47,7 +49,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteUser(`/pesanan/${cell.getValue()}`),
+                            deleteUser(`/toko/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -75,7 +77,7 @@ watch(openForm, (val) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">List Pesanan</h2>
+            <h2 class="mb-0">List Toko</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -90,7 +92,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-users"
-                url="/pesanan"
+                url="/master/toko"
                 :columns="columns"
             ></paginate>
         </div>

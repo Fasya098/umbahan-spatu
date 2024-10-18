@@ -13,8 +13,9 @@ return new class extends Migration
     {
         Schema::create('tokos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('users_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama_toko');
+            $table->string('user_id')->nullable();
+            $table->string('foto_toko');
             $table->string('deskripsi');
             $table->string('alamat');
             $table->string('nomor_telepon');

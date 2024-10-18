@@ -43,6 +43,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         ],
                     },
                     {
+                        heading: "Toko",
+                        name: "master-toko",
+                        route: "/dashboard/master/toko",
+                    },
+                    {
                         heading: "Pesanan",
                         name: "master-pesanan",
                         route: "/dashboard/master/pesanan",

@@ -19,9 +19,7 @@ class SettingController extends Controller
             $request->validate([
                 'app' => 'required',
                 'description' => 'required',
-                'pemerintah' => 'required',
                 'alamat' => 'required',
-                'dinas' => 'required',
                 'telepon' => 'required',
                 'email' => 'required',
                 'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',

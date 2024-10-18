@@ -17,16 +17,14 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-            'app' => 'e-SAKIP DLH',
-            'description' =>  'Aplikasi e-SAKIP Dinas Lingkungan Hidup',
-            'logo' =>  '/media/logo.png',
-            'bg_auth' =>  '/media/misc/bg-auth.jpg',
-            'banner' =>  '/media/misc/banner.jpg',
-            'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
-            'dinas' =>  'Dinas Lingkungan Hidup',
-            'alamat' =>  '',
-            'telepon' =>  '',
-            'email' =>  '',
+            'app' => 'Umbahan-Spatu',
+            'description' =>  'Aplikasi Cuci Sepatu',
+            'logo' =>  '/media/logo-spatu-nobackground.png',
+            'bg_auth' =>  '/media/misc/bg sepatu.jpg',
+            'banner' =>  '/media/misc/bg sepatu.jpg',
+            'alamat' =>  'Pondok Benowo Indah',
+            'telepon' =>  '08912345678',
+            'email' =>  'admin@umbahan.com',
         ]);
     }
 }

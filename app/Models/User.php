@@ -24,7 +24,6 @@ class User extends Authenticatable implements JWTSubject
         'email',
         'password',
         'phone',
-        'photo',
     ];
 
     /**
@@ -48,15 +47,15 @@ class User extends Authenticatable implements JWTSubject
 
     protected $appends = ['permission', 'role'];
 
-    protected static function booted()
-    {
-        static::deleted(function ($user) {
-            if ($user->photo != null && $user->photo != '') {
-                $old_photo = str_replace('/storage/', '', $user->photo);
-                Storage::disk('public')->delete($old_photo);
-            }
-        });
-    }
+    // protected static function booted()
+    // {
+    //     static::deleted(function ($user) {
+    //         if ($user->photo != null && $user->photo != '') {
+    //             $old_photo = str_replace('/storage/', '', $user->photo);
+    //             Storage::disk('public')->delete($old_photo);
+    //         }
+    //     });
+    // }
 
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
@@ -86,5 +85,10 @@ class User extends Authenticatable implements JWTSubject
     public function getPermissionAttribute()
     {
         return $this->getAllPermissions()->pluck('name');
+    }
+
+    public function toko () 
+    {
+        return $this->hasMany(Toko::class);
     }
 }

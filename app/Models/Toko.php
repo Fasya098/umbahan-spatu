@@ -5,17 +5,22 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Mitra extends Model
+class Toko extends Model
 {
     use HasFactory;
 
     protected $table = "tokos";
 
     protected $fillable = [
-        'users_id',
+        'user_id',
         'nama_toko',
+        'foto_toko',
         'deskripsi',
         'alamat',
         'nomor_telepon'
     ];
+
+    public function user () {
+        return $this->belongsTo(User::class);
+    }
 }
