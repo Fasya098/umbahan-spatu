@@ -103,6 +103,16 @@ const routes: Array<RouteRecordRaw> = [
                     breadcrumbs: ["Master", "Layanan"],
                 },
             },
+            {
+                path: "/dashboard/master/terima",
+                name: "dashboard.master.terima",
+                component: () =>
+                    import("@/pages/dashboard/master/terima/Index.vue"),
+                meta: {
+                    pageTitle: "Terima",
+                    breadcrumbs: ["Master", "Terima"],
+                },
+            },
         ],
     },
     {
@@ -110,6 +120,12 @@ const routes: Array<RouteRecordRaw> = [
         name: "/userpage",
         component: () => 
             import ("@/pages/userpage/Index.vue")
+    },
+    {
+        path: "/userpage/mitra",
+        name: "/userpage/mitra",
+        component: () => 
+            import ("@/pages/userpage/mitra/Index.vue")
     },
     {
         path: "/",

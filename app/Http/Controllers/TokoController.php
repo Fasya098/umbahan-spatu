@@ -19,49 +19,62 @@ class TokoController extends Controller
         $page = $request->page ? $request->page - 1 : 0;
 
         DB::statement('set @no=0+' . $page * $per);
-        $data = Toko::when($request->search, function (Builder $query, string $search) {
+        $data = Toko::with(['user'])->when($request->search, function (Builder $query, string $search) {
             $query->where('nama_toko', 'like', "%$search%")
                 ->orWhere('alamat', 'like', "%$search%")
-                ->orWhere('phone', 'like', "%$search%");
+                ->orWhere('phone', 'like', "%$search%")
+                ->orWhereHas('user', function ($query) use ($search) {
+                    $query->where('nama', 'like', "%$search%");
+                });
         })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
     }
 
-    public function add (Request $request) {
+    public function add(Request $request) {
         $request->validate([
             'nama_toko' => 'required',
             'deskripsi' => 'required',
             'alamat' => 'required',
             'nomor_telepon' => 'required',
-            'foto_toko' => 'required',
+            'foto_toko' => 'required|image', // Menambahkan validasi untuk file gambar
             'user_id' => 'required',
         ]);
-
-        $base = Toko::create ([
-            'nama_toko' => $request->input('nama_toko'),
-            'user_id' => $request->input('user_id'),
-            'foto_toko' => str_replace('public/', '', $request->file('foto_toko')->store('public/toko')),
-            'deskripsi' => $request->input('deskripsi'),
-            'alamat' => $request->input('alamat'),
-            'nomor_telepon' => $request->input('nomor_telepon'),
-        ]);
-
+    
+        // Mengambil data dari request
+        $data = $request->all();
+    
+        // Menyimpan foto dan mengubah path sesuai kebutuhan
+        $data['foto_toko'] = str_replace('public/', '', $request->file('foto_toko')->store('public/toko'));
+    
+        // Cek apakah data Toko sudah ada
+        $toko = Toko::first(); // Anda bisa mengganti dengan kondisi lain jika ingin
+    
+        if ($toko) {
+            // Jika toko sudah ada, update data toko
+            $toko->update($data);
+        } else {
+            // Jika toko belum ada, buat data toko baru
+            $toko = Toko::create($data);
+        }
+    
         return response()->json([
             'status' => true,
             'message' => 'telah disimpan',
-            'data' => $base
+            'data' => $toko
         ]);
     }
+    
+    
 
     public function show () {
-        $users = Toko::all();
-        return response()->json($users);
+        $toko = Toko::all();
+        return response()->json($toko);
     }
 
     public function edit($id)
     {
-        $base = Toko::find($id);
+        $base = Toko::where('user_id', $id)->first();
         if ($base) {
             return response()->json([
                 'data' => $base,
@@ -70,6 +83,22 @@ class TokoController extends Controller
             return response()->json([
                 'message' => "Data tidak ditemukan"
             ], 404);
+        }
+    }
+
+    public function destroy($id)
+    {
+        $dokter = Toko::find($id);
+        if ($dokter) {
+            $dokter->delete();
+            return response()->json([
+                'message' => "Data telah dihapus",
+                'code' => 200
+            ]);
+        } else {
+            return response([
+                'message' => "gagal menghapus $id / data tidak ditemukan"
+            ]);
         }
     }
 

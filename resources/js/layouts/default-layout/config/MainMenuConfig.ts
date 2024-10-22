@@ -43,6 +43,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         ],
                     },
                     {
+                        heading: "Terima Mitra",
+                        name: "master-terima",
+                        route: "/dashboard/master/terima",
+                    },
+                    {
                         heading: "Toko",
                         name: "master-toko",
                         route: "/dashboard/master/toko",

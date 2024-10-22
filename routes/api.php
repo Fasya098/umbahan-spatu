@@ -6,6 +6,8 @@ use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TokoController;
+use App\Http\Controllers\MitraController;
+use App\Http\Controllers\TerimaController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -38,6 +40,8 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     Route::prefix('master')->group(function () {
         Route::middleware('can:master-user')->group(function () {
             Route::post('users', [UserController::class, 'index']);
+            Route::post('users/terima', [MitraController::class, 'terima']);
+            Route::post('users/tolak', [MitraController::class, 'tolak']);
             Route::get('users', [UserController::class, 'get']);
             Route::get('users/{id}', [UserController::class, 'getByid']);
             Route::post('users/store', [UserController::class, 'store']);
@@ -46,8 +50,8 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
 
         Route::middleware('can:master-role')->group(function () {
-            Route::get('roles', [RoleController::class, 'get'])->withoutMiddleware('can:master-role');
-            Route::post('roles', [RoleController::class, 'index']);
+            Route::get('roles/get', [RoleController::class, 'get'])->withoutMiddleware('can:master-role');
+            Route::post('', [RoleController::class, 'index']);
             Route::post('roles/store', [RoleController::class, 'store']);
             Route::apiResource('roles', RoleController::class)
                 ->except(['index', 'store']);
@@ -59,10 +63,19 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::middleware('can:master-toko')->group(function () {
             Route::post('/toko', [TokoController::class, 'index']);
-            Route::get('/toko/get', [TokoController::class, 'show']); 
             Route::post('/toko/store', [TokoController::class, 'add']);
             Route::get('/toko/edit/{id}', [TokoController::class, 'edit']); 
+            Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']); 
+        });
+
+        Route::middleware('can:master-terima')->group(function () {
+            Route::post('', [TerimaController::class, 'index']);
+            Route::post('/store', [TerimaController::class, 'store']);
         });
     });
-    
-});  
+});
+
+    Route::prefix('userpage')->group(function() {
+        Route::post('/store', [MitraController::class, 'store']);
+        Route::get('/toko/get', [TokoController::class, 'show']);
+    });

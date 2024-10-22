@@ -7,7 +7,6 @@ import { toast } from "vue3-toastify";
 import type { User, Role } from "@/types";
 import ApiService from "@/core/services/ApiService";
 import { useRole } from "@/services/useRole";
-import { useAuthStore } from '@/stores/auth';
 
 const props = defineProps({
     selected: {
@@ -18,71 +17,68 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "refresh"]);
 
-const { user } = useAuthStore()
-
-const users = ref<User>({} as User);
+const user = ref<User>({} as User);
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
-const foto_toko = ref<any>([]);
+const photo = ref<any>([]);
 const formRef = ref();
 
-// const formSchema = Yup.object().shape({
-//     name: Yup.string().required("Nama harus diisi"),
-//     email: Yup.string()
-//         .email("Email harus valid")
-//         .required("Email harus diisi"),
-//     password: Yup.string().min(8, "Minimal 8 karakter").nullable(),
-//     passwordConfirmation: Yup.string()
-//         .oneOf([Yup.ref("password")], "Konfirmasi password harus sama")
-//         .nullable(),
-//     phone: Yup.string().required("Nomor Telepon harus diisi"),
-//     role_id: Yup.string().required("Pilih role"),
-// });
+const formSchema = Yup.object().shape({
+    name: Yup.string().required("Nama harus diisi"),
+    email: Yup.string()
+        .email("Email harus valid")
+        .required("Email harus diisi"),
+    password: Yup.string().min(8, "Minimal 8 karakter").nullable(),
+    passwordConfirmation: Yup.string()
+        .oneOf([Yup.ref("password")], "Konfirmasi password harus sama")
+        .nullable(),
+    phone: Yup.string().required("Nomor Telepon harus diisi"),
+    role_id: Yup.string().required("Pilih role"),
+});
 
 function getEdit() {
     block(document.getElementById("form-user"));
-        ApiService.get(`master/toko/edit/${user.id}`)
-            .then(({ data }) => {
-                users.value = data.data;
-                foto_toko.value = data.data.foto_toko ? ["/storage/" + data.data.foto_toko] : [];
-            })
-            .finally(() => {
-                unblock(document.getElementById("form-user"));
-            });
+    ApiService.get("master/users", props.selected)
+        .then(({ data }) => {
+            user.value = data.user;
+            photo.value = data.user.photo
+                ? ["/storage/" + data.user.photo]
+                : [];
+        })
+        .catch((err: any) => {
+            toast.error(err.response.data.message);
+        })
+        .finally(() => {
+            unblock(document.getElementById("form-user"));
+        });
 }
 
 function submit() {
     const formData = new FormData();
-    formData.append("nama_toko", users.value.nama_toko);
-    formData.append("foto_toko", users.value.foto_toko);
-    formData.append("deskripsi", users.value.deskripsi);
-    formData.append("alamat", users.value.alamat);
-    formData.append("nomor_telepon", users.value.nomor_telepon);
+    formData.append("name", user.value.name);
+    formData.append("email", user.value.email);
+    formData.append("phone", user.value.phone);
+    formData.append("role_id", user.value.role_id);
 
-    // if (user.value?.password) {
-    //     formData.append("password", user.value.password);
-    //     formData.append(
-    //         "password_confirmation",
-    //         user.value.passwordConfirmation
-    //     );
-    // }
-    if (foto_toko.value.length) {
-        formData.append("foto_toko", foto_toko.value[0].file);
+    if (user.value?.password) {
+        formData.append("password", user.value.password);
+        formData.append(
+            "password_confirmation",
+            user.value.passwordConfirmation
+        );
     }
-
- // Tambahkan user_id yang diambil dari /auth/me
- if (user.id) {
-        formData.append("user_id", user.id);
+    if (photo.value.length) {
+        formData.append("photo", photo.value[0].file);
     }
-    // if (props.selected) {
-    //     formData.append("_method", "PUT");
-    // }
+    if (props.selected) {
+        formData.append("_method", "PUT");
+    }
 
     block(document.getElementById("form-user"));
     axios({
         method: "post",
         url: props.selected
-            ? `/master/toko/${props.selected}`
-            : "/master/toko/store",
+            ? `/master/users/${props.selected}`
+            : "/master/users/store",
         data: formData,
         headers: {
             "Content-Type": "multipart/form-data",
@@ -93,7 +89,6 @@ function submit() {
             emit("refresh");
             toast.success("Data berhasil disimpan");
             formRef.value.resetForm();
-            getEdit();
         })
         .catch((err: any) => {
             formRef.value.setErrors(err.response.data.errors);
@@ -112,10 +107,11 @@ const roles = computed(() =>
     }))
 );
 
-onMounted(() => {
-    getEdit(); 
+onMounted(async () => {
+    if (props.selected) {
+        getEdit();
+    }
 });
-
 
 watch(
     () => props.selected,
@@ -136,15 +132,15 @@ watch(
         ref="formRef"
     >
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Profile Details</h2>
-            <!-- <button
+            <h2 class="mb-0">{{ selected ? "Edit" : "Tambah" }} User</h2>
+            <button
                 type="button"
                 class="btn btn-sm btn-light-danger ms-auto"
                 @click="emit('close')"
             >
                 Batal
                 <i class="la la-times-circle p-0"></i>
-            </button> -->
+            </button>
         </div>
         <div class="card-body">
             <div class="row">
@@ -152,19 +148,19 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">
-                            Nama Toko
+                            Nama
                         </label>
                         <Field
                             class="form-control form-control-lg form-control-solid"
                             type="text"
-                            name="nama_toko"
+                            name="name"
                             autocomplete="off"
-                            v-model="users.nama_toko"
+                            v-model="user.name"
                             placeholder="Masukkan Nama"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="nama_toko" />
+                                <ErrorMessage name="name" />
                             </div>
                         </div>
                     </div>
@@ -174,19 +170,19 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">
-                            Deskripsi
+                            Email
                         </label>
                         <Field
                             class="form-control form-control-lg form-control-solid"
                             type="text"
-                            name="deskripsi"
+                            name="email"
                             autocomplete="off"
-                            v-model="users.deskripsi"
-                            placeholder="Masukkan deskripsi"
+                            v-model="user.email"
+                            placeholder="Masukkan Email"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="deskripsi" />
+                                <ErrorMessage name="email" />
                             </div>
                         </div>
                     </div>
@@ -196,19 +192,19 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6">
-                            alamat
+                            Password
                         </label>
                         <Field
                             class="form-control form-control-lg form-control-solid"
-                            type="text"
-                            name="alamat"
+                            type="password"
+                            name="password"
                             autocomplete="off"
-                            v-model="users.alamat"
-                            placeholder="Masukkan alamat"
+                            v-model="user.password"
+                            placeholder="Masukkan password"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="alamat" />
+                                <ErrorMessage name="password" />
                             </div>
                         </div>
                     </div>
@@ -218,19 +214,69 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6">
+                            Konfirmasi Password
+                        </label>
+                        <Field
+                            class="form-control form-control-lg form-control-solid"
+                            type="password"
+                            name="passwordConfirmation"
+                            autocomplete="off"
+                            v-model="user.passwordConfirmation"
+                            placeholder="Konfirmasi password"
+                        />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="passwordConfirmation" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <div class="col-md-6">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">
+                            Role
+                        </label>
+                        <Field
+                            name="role_id"
+                            type="hidden"
+                            v-model="user.role_id"
+                        >
+                            <select2
+                                placeholder="Pilih role"
+                                class="form-select-solid"
+                                :options="roles"
+                                name="role_id"
+                                v-model="user.role_id"
+                            >
+                            </select2>
+                        </Field>
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="role_id" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <div class="col-md-6">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">
                             Nomor Telepon
                         </label>
                         <Field
                             class="form-control form-control-lg form-control-solid"
                             type="text"
-                            name="nomor_telepon"
+                            name="phone"
                             autocomplete="off"
-                            v-model="users.nomor_telepon"
-                            placeholder="No Telepon"
+                            v-model="user.phone"
+                            placeholder="Masukkan No Telepon"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="nomor_telepon" />
+                                <ErrorMessage name="phone" />
                             </div>
                         </div>
                     </div>
@@ -240,19 +286,19 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6">
-                            Foto Toko
+                            User Photo
                         </label>
                         <!--begin::Input-->
                         <file-upload
-                            :files="foto_toko"
+                            :files="photo"
                             :accepted-file-types="fileTypes"
                             required
-                            v-on:updatefiles="(file) => (foto_toko = file)"
+                            v-on:updatefiles="(file) => (photo = file)"
                         ></file-upload>
                         <!--end::Input-->
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="foto_toko" />
+                                <ErrorMessage name="photo" />
                             </div>
                         </div>
                     </div>

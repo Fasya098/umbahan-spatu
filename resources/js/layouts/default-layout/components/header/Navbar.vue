@@ -54,12 +54,10 @@ for (let i = new Date().getFullYear(); i >= new Date().getFullYear() - 2; i--) {
             <!--begin::Menu wrapper-->
             <div class="cursor-pointer symbol symbol-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
                 data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                <i :class="['fas', 'fa-user']" 
-       :style="{ 
-           color: themeMode === 'dark' ? 'white' : 'black', 
-           fontSize: '26px' 
-       }"
-       aria-hidden="true"></i>
+                <i :class="['fas', 'fa-user']" :style="{
+                    color: themeMode === 'dark' ? 'white' : 'black',
+                    fontSize: '26px'
+                }" aria-hidden="true"></i>
             </div>
             <KTUserMenu />
             <!--end::Menu wrapper-->
@@ -67,11 +65,11 @@ for (let i = new Date().getFullYear(); i >= new Date().getFullYear() - 2; i--) {
         <!--end::User menu-->
 
         <!--begin::Header menu toggle-->
-        <div class="app-navbar-item d-lg-none ms-2 me-n2" v-tooltip title="Show header menu">
+        <!-- <div class="app-navbar-item d-lg-none ms-2 me-n2" v-tooltip title="Show header menu">
             <div class="btn btn-flex btn-icon btn-active-color-primary w-30px h-30px" id="kt_app_header_menu_toggle">
                 <KTIcon icon-name="element-4" icon-class="fs-2" />
             </div>
-        </div>
+        </div> -->
         <!--end::Header menu toggle-->
     </div>
     <!--end::Navbar-->
