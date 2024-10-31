@@ -57,7 +57,10 @@ const signOut = () => {
                 icon: "success",
                 text: "Berhasil keluar",
             }).then(() => {
-                router.push({ name: "sign-in" });
+                window.location.reload();
+                setTimeout(() => {
+                    router.push({ name: "sign-in" });
+                }, 100);
             });
         }
     });
@@ -79,10 +82,8 @@ const currentLangugeLocale = computed(() => {
 
 <template>
     <!--begin::Menu-->
-    <div
-        class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px"
-        data-kt-menu="true"
-    >
+    <div class="menu menu-sub menu-sub-dropdown menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px"
+        data-kt-menu="true">
         <!--begin::Menu item-->
         <div class="menu-item px-3">
             <div class="menu-content d-flex align-items-center px-3">
@@ -91,16 +92,11 @@ const currentLangugeLocale = computed(() => {
                 <div class="d-flex flex-column mx-4">
                     <div class="fw-bold d-flex align-items-center fs-5">
                         {{ store.user.name }}
-                        <span
-                            class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
-                        >
+                        <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">
                             {{ store.user.role.name }}
                         </span>
                     </div>
-                    <a
-                        href="#"
-                        class="fw-semibold text-muted text-hover-primary fs-7"
-                    >
+                    <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">
                         {{ store.user.email }}
                     </a>
                 </div>

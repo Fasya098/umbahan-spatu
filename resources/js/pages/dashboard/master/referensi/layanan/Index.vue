@@ -4,6 +4,7 @@ import { useDelete } from "@/libs/hooks";
 import Form from "./Form.vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { User } from "@/types";
+import { currency } from "@/libs/utils";
 
 const column = createColumnHelper<User>();
 const paginateRef = ref<any>(null);
@@ -18,14 +19,8 @@ const columns = [
     column.accessor("no", {
         header: "#",
     }),
-    column.accessor("name", {
-        header: "Nama",
-    }),
-    column.accessor("email", {
-        header: "Email",
-    }),
-    column.accessor("phone", {
-        header: "No. Telp",
+    column.accessor("nama_layanan", {
+        header: "Nama Layanan",
     }),
     column.accessor("id", {
         header: "Aksi",
@@ -47,7 +42,7 @@ const columns = [
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteUser(`/master/users/destroy/${cell.getValue()}`),
+                            deleteUser(`/master/referensi/layanan/destroy/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
@@ -75,7 +70,7 @@ watch(openForm, (val) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">List Users</h2>
+            <h2 class="mb-0">Referensi Layanan</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -90,7 +85,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-users"
-                url="/master/users"
+                url="/master/referensi/layanan"
                 :columns="columns"
             ></paginate>
         </div>

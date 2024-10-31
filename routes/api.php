@@ -8,6 +8,8 @@ use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TokoController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\TerimaController;
+use App\Http\Controllers\LayananController;
+use App\Http\Controllers\ReferensiLayananController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,18 +42,20 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     Route::prefix('master')->group(function () {
         Route::middleware('can:master-user')->group(function () {
             Route::post('users', [UserController::class, 'index']);
-            Route::post('users/terima', [MitraController::class, 'terima']);
-            Route::post('users/tolak', [MitraController::class, 'tolak']);
-            Route::get('users', [UserController::class, 'get']);
-            Route::get('users/{id}', [UserController::class, 'getByid']);
+            Route::get('users/get', [UserController::class, 'get']);
             Route::post('users/store', [UserController::class, 'store']);
-            Route::apiResource('users', UserController::class)
-                ->except(['index', 'store'])->scoped(['user' => 'uuid']);
+            Route::get('users/edit/{id}', [UserController::class, 'edit']);
+            Route::put('users/update/{id}', [UserController::class, 'update']);
+            Route::delete('users/destroy/{id}', [UserController::class, 'destroy']);
+            Route::post('users/terima', [MitraController::class, 'terima']);
+            Route::post('terima', [UserController::class, 'indexTerima']);
+            Route::post('users/tolak', [MitraController::class, 'tolak']);
         });
 
         Route::middleware('can:master-role')->group(function () {
-            Route::get('roles/get', [RoleController::class, 'get'])->withoutMiddleware('can:master-role');
-            Route::post('', [RoleController::class, 'index']);
+            Route::get('roles/get', [RoleController::class, 'get']);
+            Route::post('roles', [RoleController::class, 'index']);
+            Route::post('roles/show', [RoleController::class, 'show']);
             Route::post('roles/store', [RoleController::class, 'store']);
             Route::apiResource('roles', RoleController::class)
                 ->except(['index', 'store']);
@@ -63,14 +67,33 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::middleware('can:master-toko')->group(function () {
             Route::post('/toko', [TokoController::class, 'index']);
+            Route::get('/toko/get', [TokoController::class, 'show']);
             Route::post('/toko/store', [TokoController::class, 'add']);
             Route::get('/toko/edit/{id}', [TokoController::class, 'edit']); 
             Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']); 
         });
 
+        Route::middleware('can:master-layanan')->group(function () {
+            Route::post('/layanan', [LayananController::class, 'index']);
+            Route::get('/layanan/get', [LayananController::class, 'get']);
+            Route::post('/layanan/store', [LayananController::class, 'store']);
+            Route::get('/layanan/edit/{id}', [LayananController::class, 'edit']);
+            Route::put('/layanan/update/{id}', [LayananController::class, 'update']);
+            Route::delete('/layanan/destroy/{id}', [LayananController::class, 'destroy']); 
+        });
+
         Route::middleware('can:master-terima')->group(function () {
             Route::post('', [TerimaController::class, 'index']);
             Route::post('/store', [TerimaController::class, 'store']);
+        });
+
+        Route::middleware('can:master-referensi-layanan')->group(function () {
+            Route::post('referensi/layanan', [ReferensiLayananController::class, 'index']);
+            Route::get('/referensi/layanan/get', [ReferensiLayananController::class, 'get']);
+            Route::post('/referensi/layanan/store', [ReferensiLayananController::class, 'store']);
+            Route::get('/referensi/layanan/edit/{id}', [ReferensiLayananController::class, 'edit']);
+            Route::put('/referensi/layanan/update/{id}', [ReferensiLayananController::class, 'update']);
+            Route::delete('/referensi/layanan/destroy/{id}', [ReferensiLayananController::class, 'destroy']);
         });
     });
 });

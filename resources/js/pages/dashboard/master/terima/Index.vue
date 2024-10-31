@@ -20,6 +20,7 @@ const handleTerima = async (userId) => {
         // Menangani response sukses
         console.log(response.data);
         toast.success('Mitra Diterima!');
+        refresh();
     } catch (error) {
         // Menangani error
         console.error(error);
@@ -35,6 +36,7 @@ const handleTolak = async (userId) => {
         // Menangani response sukses
         console.log(response.data);
         toast.success('Mitra Ditolak!');
+        refresh();
     } catch (error) {
         // Menangani error
         console.error(error);
@@ -60,29 +62,29 @@ const columns = [
         header: "No. Telp",
     }),
     column.accessor("id", {
-    header: "Aksi",
-    cell: (cell) => {
-        const user_id = cell.getValue(); // Ambil user_id dari cell
-        return h("div", { class: "d-flex gap-2" }, [ // Pastikan untuk mengembalikan elemen
-            h(
-                "button",
-                {
-                    class: "btn btn-sm btn-icon btn-success",
-                    onClick: () => handleTerima(user_id),
-                },
-                h("i", { class: "la la-check fs-2" })
-            ),
-            h(
-                "button",
-                {
-                    class: "btn btn-sm btn-icon btn-danger",
-                    onClick: () => handleTolak(user_id), // Jika perlu mengirim user_id
-                },
-                h("i", { class: "la la-times fs-2" })
-            ),
-        ]);
-    },
-}),
+        header: "Aksi",
+        cell: (cell) => {
+            const user_id = cell.getValue(); // Ambil user_id dari cell
+            return h("div", { class: "d-flex gap-2" }, [ // Pastikan untuk mengembalikan elemen
+                h(
+                    "button",
+                    {
+                        class: "btn btn-sm btn-icon btn-success",
+                        onClick: () => handleTerima(user_id),
+                    },
+                    h("i", { class: "la la-check fs-2" })
+                ),
+                h(
+                    "button",
+                    {
+                        class: "btn btn-sm btn-icon btn-danger",
+                        onClick: () => handleTolak(user_id), // Jika perlu mengirim user_id
+                    },
+                    h("i", { class: "la la-times fs-2" })
+                ),
+            ]);
+        },
+    }),
 
 ];
 
@@ -102,13 +104,9 @@ watch(openForm, (val) => {
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">List Terima Mitra</h2>
-            <button type="button" class="btn btn-sm btn-primary ms-auto" v-if="!openForm" @click="openForm = true">
-                Tambah
-                <i class="la la-plus"></i>
-            </button>
         </div>
         <div class="card-body">
-            <paginate ref="paginateRef" id="table-users" url="/master/users" :columns="columns"></paginate>
+            <paginate ref="paginateRef" id="table-users" url="/master/terima" :columns="columns"></paginate>
         </div>
     </div>
 </template>

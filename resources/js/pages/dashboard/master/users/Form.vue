@@ -37,12 +37,9 @@ const formSchema = Yup.object().shape({
 
 function getEdit() {
     block(document.getElementById("form-user"));
-    ApiService.get("master/users", props.selected)
+    ApiService.get("master/users/edit", props.selected)
         .then(({ data }) => {
-            user.value = data.user;
-            photo.value = data.user.photo
-                ? ["/storage/" + data.user.photo]
-                : [];
+            user.value = data.data;
         })
         .catch((err: any) => {
             toast.error(err.response.data.message);
@@ -66,9 +63,6 @@ function submit() {
             user.value.passwordConfirmation
         );
     }
-    if (photo.value.length) {
-        formData.append("photo", photo.value[0].file);
-    }
     if (props.selected) {
         formData.append("_method", "PUT");
     }
@@ -77,7 +71,7 @@ function submit() {
     axios({
         method: "post",
         url: props.selected
-            ? `/master/users/${props.selected}`
+            ? `/master/users/update/${props.selected}`
             : "/master/users/store",
         data: formData,
         headers: {
@@ -277,28 +271,6 @@ watch(
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="phone" />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
-                </div>
-                <div class="col-md-6">
-                    <!--begin::Input group-->
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">
-                            User Photo
-                        </label>
-                        <!--begin::Input-->
-                        <file-upload
-                            :files="photo"
-                            :accepted-file-types="fileTypes"
-                            required
-                            v-on:updatefiles="(file) => (photo = file)"
-                        ></file-upload>
-                        <!--end::Input-->
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="photo" />
                             </div>
                         </div>
                     </div>

@@ -12,9 +12,18 @@ class Layanan extends Model
     protected $table = "layanans";
 
     protected $fillable = [
-        'tokos_id',
-        'nama_layanan',
+        'user_id',
+        'referensi_layanan_id',
         'harga',
-        'kategori',
     ];
+
+    public function User()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function ReferensiLayanan ()
+    {
+        return $this->belongsTo(ReferensiLayanan::class);
+    }     
 }

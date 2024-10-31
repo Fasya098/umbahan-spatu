@@ -53,14 +53,19 @@ const MainMenuConfig: Array<MenuItem> = [
                         route: "/dashboard/master/toko",
                     },
                     {
+                        heading: "Layanan",
+                        name: "master-layanan",
+                        route: "/dashboard/master/layanan",
+                    },
+                    {
                         heading: "Pesanan",
                         name: "master-pesanan",
                         route: "/dashboard/master/pesanan",
                     },
                     {
-                        heading: "Layanan",
-                        name: "master-layanan",
-                        route: "/dashboard/master/layanan",
+                        heading: "Referensi Layanan",
+                        name: "master-referensi-layanan",
+                        route: "/dashboard/master/referensi/layanan",
                     },
                 ],
             },

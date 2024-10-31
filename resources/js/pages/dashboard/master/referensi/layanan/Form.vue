@@ -4,11 +4,9 @@ import { onMounted, ref, watch, computed } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
-import type { User, Role, ReferensiLayanan } from "@/types";
+import type { User, Role } from "@/types";
 import ApiService from "@/core/services/ApiService";
 import { useRole } from "@/services/useRole";
-import { useUser } from "@/services/useUser";
-import { useReferensiLayanan } from "@/services/useReferensiLayanan";
 
 const props = defineProps({
     selected: {
@@ -39,8 +37,9 @@ const formRef = ref();
 
 function getEdit() {
     block(document.getElementById("form-user"));
-    ApiService.get("master/layanan/edit", props.selected)
+    ApiService.get("master/referensi/layanan/edit", props.selected)
         .then(({ data }) => {
+            console.log(data)
             user.value = data.data;
         })
         .catch((err: any) => {
@@ -53,8 +52,7 @@ function getEdit() {
 
 function submit() {
     const formData = new FormData();
-    formData.append("user_id", user.value.user_id);
-    formData.append("referensi_layanan_id", user.value.referensi_layanan_id);
+    formData.append("nama_layanan", user.value.nama_layanan);
     formData.append("harga", user.value.harga);
 
     if (props.selected) {
@@ -65,8 +63,8 @@ function submit() {
     axios({
         method: "post",
         url: props.selected
-            ? `/master/layanan/update/${props.selected}`
-            : "/master/layanan/store",
+            ? `/master/referensi/layanan/update/${props.selected}`
+            : "/master/referensi/layanan/store",
         data: formData,
         headers: {
             "Content-Type": "multipart/form-data",
@@ -95,22 +93,6 @@ const roles = computed(() =>
     }))
 );
 
-const userService = useUser();
-const pilihUser = computed(() =>
-    userService.data.value?.map((item: User) => ({
-        id: item.id,
-        text: item.name,
-    }))
-)
-
-const referensiLayanan = useReferensiLayanan();
-const referensiLayanans = computed(() =>
-    referensiLayanan.data.value?.map((item: ReferensiLayanan) => ({
-        id: item.id,
-        text: item.nama_layanan,
-    }))
-)
-
 onMounted(async () => {
     if (props.selected) {
         getEdit();
@@ -136,7 +118,7 @@ watch(
         ref="formRef"
     >
         <div class="card-header align-items-center">
-            <h2 class="mb-0">{{ selected ? "Edit" : "Tambah" }} Layanan</h2>
+            <h2 class="mb-0">{{ selected ? "Edit" : "Tambah" }} Referensi Layanan</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-light-danger ms-auto"
@@ -152,75 +134,19 @@ watch(
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">
-                            User
-                        </label>
-                        <Field
-                            name="user_id"
-                            type="hidden"
-                            v-model="user.user_id"
-                        >
-                            <select2
-                                placeholder="Pilih user"
-                                class="form-select-solid"
-                                :options="pilihUser"
-                                name="user_id"
-                                v-model="user.user_id"
-                            >
-                            </select2>
-                        </Field>
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="user_id" />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
-                </div>
-                <div class="col-md-6">
-                    <!--begin::Input group-->
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
                             Nama Layanan
-                        </label>
-                        <Field
-                            name="referensi_layanan_id"
-                            type="hidden"
-                            v-model="user.referensi_layanan_id"
-                        >
-                            <select2
-                                placeholder="Pilih user"
-                                class="form-select-solid"
-                                :options="referensiLayanans"
-                                name="referensi_layanan_id"
-                                v-model="user.referensi_layanan_id"
-                            >
-                            </select2>
-                        </Field>
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="referensi_layanan_id" />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
-                </div>
-                <div class="col-md-6">
-                    <!--begin::Input group-->
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
-                            Harga
                         </label>
                         <Field
                             class="form-control form-control-lg form-control-solid"
                             type="text"
-                            name="harga"
+                            name="nama_layanan"
                             autocomplete="off"
-                            v-model="user.harga"
-                            placeholder="Masukkan No Telepon"
+                            v-model="user.nama_layanan"
+                            placeholder="Masukkan Nama"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="harga" />
+                                <ErrorMessage name="nama_layanan" />
                             </div>
                         </div>
                     </div>

@@ -94,13 +94,23 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: "/dashboard/master/referensi/layanan",
+                name: "dashboard.master.referensi.layanan",
+                component: () =>
+                    import("@/pages/dashboard/master/referensi/layanan/Index.vue"),
+                meta: {
+                    pageTitle: "Referensi Layanan",
+                    breadcrumbs: ["Master", "Referensi Layanan"],
+                },
+            },
+            {
                 path: "/dashboard/master/layanan",
                 name: "dashboard.master.layanan",
                 component: () =>
                     import("@/pages/dashboard/master/layanan/Index.vue"),
                 meta: {
                     pageTitle: "Layanan",
-                    breadcrumbs: ["Master", "Layanan"],
+                    breadcrumbs: ["master", "Layanan"],
                 },
             },
             {
@@ -118,14 +128,12 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: "/userpage",
         name: "/userpage",
-        component: () => 
-            import ("@/pages/userpage/Index.vue")
+        component: () => import("@/pages/userpage/Index.vue"),
     },
     {
         path: "/userpage/mitra",
         name: "/userpage/mitra",
-        component: () => 
-            import ("@/pages/userpage/mitra/Index.vue")
+        component: () => import("@/pages/userpage/mitra/Index.vue"),
     },
     {
         path: "/",
@@ -172,8 +180,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: "/userpage/index",
         name: "userpage.index",
-        component: () =>
-            import("@/pages/userpage/Index.vue"),
+        component: () => import("@/pages/userpage/Index.vue"),
         // meta: {
         //     pageTitle: "User Roles",
         //     breadcrumbs: ["Master", "Users", "Roles"],
@@ -213,8 +220,9 @@ router.beforeEach(async (to, from, next) => {
 
     // current page view title
     if (to.meta.pageTitle) {
-        document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME
-            }`;
+        document.title = `${to.meta.pageTitle} - ${
+            import.meta.env.VITE_APP_NAME
+        }`;
     } else {
         document.title = import.meta.env.VITE_APP_NAME as string;
     }

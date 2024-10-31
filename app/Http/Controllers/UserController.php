@@ -26,17 +26,13 @@ class UserController extends Controller
         ]);
     }
 
-    public function getByid($id)
+    public function edit($id)
     {
-        $base = User::find($id);
-
-        if (!$base) {
-            return response()->json([
-                'message' => 'data tidak ditemukan',
-            ], 404);
-        }
-
-        return response()->json($base);
+        $ReferensiLayanan = User::find($id);
+        return response()->json([
+            'success' => true,
+            'data' => $ReferensiLayanan
+        ]);
     }
 
     /**
@@ -55,6 +51,26 @@ class UserController extends Controller
         })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
+    }
+
+    public function indexTerima(Request $request)
+    {
+        $per = $request->per ?? 10;
+    $page = $request->page ? $request->page - 1 : 0;
+
+    DB::statement('set @no=0+' . $page * $per);
+    
+    // Tambahkan filter where status = 2
+    $data = User::where('status', 2)
+        ->when($request->search, function (Builder $query, string $search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('phone', 'like', "%$search%");
+        })
+        ->latest()
+        ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
+    return response()->json($data);
     }
 
     /**
@@ -89,30 +105,39 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(Request $request, $id)
     {
-        $validatedData = $request->validated();
+        $base = User::find($id);
+        if ($base) {
+            $base->update($request->all());
 
-        $user->update($validatedData);
-
-        $role = Role::findById($validatedData['role_id']);
-        $user->syncRoles($role);
-
-        return response()->json([
-            'success' => true,
-            'user' => $user
-        ]);
+            return response()->json([
+                'status' => 'true',
+                'message' => 'data berhasil diubah'
+            ]);
+        } else {
+            return response([
+                'message' => 'gagal mengubah'
+            ]);
+        }
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(User $user)
+    public function destroy($id)
     {
-        $user->delete();
-
-        return response()->json([
-            'success' => true
-        ]);
+        $base = User::find($id);
+        if ($base) {
+            $base->delete();
+            return response()->json([
+                'message' => "Data successfully deleted",
+                'code' => 200
+            ]);
+        } else {
+            return response([
+                'message' => "Failed delete data $id / data doesn't exists"
+            ]);
+        }
     }
 }

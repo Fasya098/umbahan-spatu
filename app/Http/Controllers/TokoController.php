@@ -65,11 +65,8 @@ class TokoController extends Controller
         ]);
     }
     
-    
-
     public function show () {
-        $toko = Toko::all();
-        return response()->json($toko);
+        return response()->json(['data' => User::all()]);
     }
 
     public function edit($id)

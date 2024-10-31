@@ -93,4 +93,9 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->hasMany(Toko::class);
     }
+
+    public function Layanan ()
+    {
+        return $this->hasMany(Layanan::class);
+    }
 }
