@@ -10,6 +10,7 @@ use App\Http\Controllers\MitraController;
 use App\Http\Controllers\TerimaController;
 use App\Http\Controllers\LayananController;
 use App\Http\Controllers\ReferensiLayananController;
+use App\Http\Controllers\RequestLayananController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -91,9 +92,19 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::post('referensi/layanan', [ReferensiLayananController::class, 'index']);
             Route::get('/referensi/layanan/get', [ReferensiLayananController::class, 'get']);
             Route::post('/referensi/layanan/store', [ReferensiLayananController::class, 'store']);
+            Route::post('/referensi/layanan/tolak', [ReferensiLayananController::class, 'tolak']);
+            Route::post('/referensi/layanan/terima', [ReferensiLayananController::class, 'terima']);
             Route::get('/referensi/layanan/edit/{id}', [ReferensiLayananController::class, 'edit']);
             Route::put('/referensi/layanan/update/{id}', [ReferensiLayananController::class, 'update']);
             Route::delete('/referensi/layanan/destroy/{id}', [ReferensiLayananController::class, 'destroy']);
+        });
+        Route::middleware('can:master-request-layanan')->group(function () {
+            Route::post('request/layanan', [RequestLayananController::class, 'index']);
+            Route::get('/request/layanan/get', [RequestLayananController::class, 'get']);
+            Route::post('/request/layanan/store', [RequestLayananController::class, 'store']);
+            Route::get('/request/layanan/edit/{id}', [RequestLayananController::class, 'edit']);
+            Route::put('/request/layanan/update/{id}', [RequestLayananController::class, 'update']);
+            Route::delete('/request/layanan/destroy/{id}', [RequestLayananController::class, 'destroy']);
         });
     });
 });

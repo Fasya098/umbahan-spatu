@@ -48,6 +48,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         route: "/dashboard/master/terima",
                     },
                     {
+                        heading: "Terima Layanan",
+                        name: "master-terima-layanan",
+                        route: "/dashboard/master/terima/layanan",
+                    },
+                    {
                         heading: "Toko",
                         name: "master-toko",
                         route: "/dashboard/master/toko",
@@ -66,6 +71,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         heading: "Referensi Layanan",
                         name: "master-referensi-layanan",
                         route: "/dashboard/master/referensi/layanan",
+                    },
+                    {
+                        heading: "Request Layanan",
+                        name: "master-request-layanan",
+                        route: "/dashboard/master/request/layanan",
                     },
                 ],
             },

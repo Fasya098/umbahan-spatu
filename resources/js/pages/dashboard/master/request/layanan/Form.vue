@@ -4,12 +4,9 @@ import { onMounted, ref, watch, computed } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
-import type { User, Role, ReferensiLayanan } from "@/types";
+import type { User, Role } from "@/types";
 import ApiService from "@/core/services/ApiService";
 import { useRole } from "@/services/useRole";
-import { useUser } from "@/services/useUser";
-import { useReferensiLayanan } from "@/services/useReferensiLayanan";
-import { useAuthStore } from  '@/stores/auth'
 
 const props = defineProps({
     selected: {
@@ -20,12 +17,10 @@ const props = defineProps({
 
 const emit = defineEmits(["close", "refresh"]);
 
-const data = ref<User>({} as User);
+const user = ref<User>({} as User);
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const photo = ref<any>([]);
 const formRef = ref();
-
-const { user } = useAuthStore()
 
 // const formSchema = Yup.object().shape({
 //     name: Yup.string().required("Nama harus diisi"),
@@ -42,9 +37,10 @@ const { user } = useAuthStore()
 
 function getEdit() {
     block(document.getElementById("form-user"));
-    ApiService.get("master/layanan/edit", props.selected)
+    ApiService.get("master/request/layanan/edit", props.selected)
         .then(({ data }) => {
-            data.value = data.data;
+            console.log(data)
+            user.value = data.data;
         })
         .catch((err: any) => {
             toast.error(err.response.data.message);
@@ -56,9 +52,8 @@ function getEdit() {
 
 function submit() {
     const formData = new FormData();
-    formData.append("user_id", user.id);
-    formData.append("referensi_layanan_id", data.value.referensi_layanan_id);
-    formData.append("harga", data.value.harga);
+    formData.append("request_nama_layanan", user.value.request_nama_layanan);
+    formData.append("harga", user.value.harga);
 
     if (props.selected) {
         formData.append("_method", "PUT");
@@ -68,8 +63,8 @@ function submit() {
     axios({
         method: "post",
         url: props.selected
-            ? `/master/layanan/update/${props.selected}`
-            : "/master/layanan/store",
+            ? `/master/request/layanan/update/${props.selected}`
+            : "/master/request/layanan/store",
         data: formData,
         headers: {
             "Content-Type": "multipart/form-data",
@@ -98,22 +93,6 @@ const roles = computed(() =>
     }))
 );
 
-const userService = useUser();
-const pilihUser = computed(() =>
-    userService.data.value?.map((item: User) => ({
-        id: item.id,
-        text: item.name,
-    }))
-)
-
-const referensiLayanan = useReferensiLayanan();
-const referensiLayanans = computed(() =>
-    referensiLayanan.data.value?.map((item: ReferensiLayanan) => ({
-        id: item.id,
-        text: item.nama_layanan,
-    }))
-)
-
 onMounted(async () => {
     if (props.selected) {
         getEdit();
@@ -139,7 +118,7 @@ watch(
         ref="formRef"
     >
         <div class="card-header align-items-center">
-            <h2 class="mb-0">{{ selected ? "Edit" : "Tambah" }} Layanan</h2>
+            <h2 class="mb-0">{{ selected ? "Edit" : "Tambah" }} Request Layanan</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-light-danger ms-auto"
@@ -158,44 +137,16 @@ watch(
                             Nama Layanan
                         </label>
                         <Field
-                            name="referensi_layanan_id"
-                            type="hidden"
-                            v-model="data.referensi_layanan_id"
-                        >
-                            <select2
-                                placeholder="Pilih user"
-                                class="form-select-solid"
-                                :options="referensiLayanans"
-                                name="referensi_layanan_id"
-                                v-model="data.referensi_layanan_id"
-                            >
-                            </select2>
-                        </Field>
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="referensi_layanan_id" />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
-                </div>
-                <div class="col-md-6">
-                    <!--begin::Input group-->
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
-                            Harga
-                        </label>
-                        <Field
                             class="form-control form-control-lg form-control-solid"
-                            type="number"
-                            name="harga"
+                            type="text"
+                            name="request_nama_layanan"
                             autocomplete="off"
-                            v-model="data.harga"
-                            placeholder="Masukkan No Telepon"
+                            v-model="user.request_nama_layanan"
+                            placeholder="Masukkan Nama"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
-                                <ErrorMessage name="harga" />
+                                <ErrorMessage name="request_nama_layanan" />
                             </div>
                         </div>
                     </div>

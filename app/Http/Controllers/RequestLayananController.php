@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Layanan;
+use App\Models\RequestLayanan;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Role;
@@ -11,8 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
-
-class LayananController extends Controller
+class RequestLayananController extends Controller
 {
     public function index(Request $request)
     {
@@ -20,13 +19,10 @@ class LayananController extends Controller
         $page = $request->page ? $request->page - 1 : 0;
 
         DB::statement('set @no=0+' . $page * $per);
-        $data = Layanan::when($request->search, function (Builder $query, string $search) {
+        $data = RequestLayanan::when($request->search, function (Builder $query, string $search) {
             $query->where('nama_layanan', 'like', "%$search%")
                 ->orWhere('harga', 'like', "%$search%");
-        })
-        ->with(['user', 'referensiLayanan'])
-        ->latest()
-        ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+        })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
     }
@@ -35,16 +31,12 @@ class LayananController extends Controller
     {
         // Validasi data input
         $request->validate([
-            'user_id' => 'required',
-            'referensi_layanan_id' => 'required',
-            'harga' => 'required',
+            'request_nama_layanan' => 'required',
         ]);
 
         // Buat user baru dengan role_id = 2
-        $user = Layanan::create([
-            'user_id' => $request->user_id,
-            'referensi_layanan_id' => $request->referensi_layanan_id,
-            'harga' => $request->harga,
+        $user = RequestLayanan::create([
+            'request_nama_layanan' => $request->request_nama_layanan,
         ]);
 
         // Berikan respon sukses atau redirect ke halaman lain
@@ -55,12 +47,12 @@ class LayananController extends Controller
     }
 
     public function get () {
-        return response()->json(['data' => Layanan::all()]);
+        return response()->json(['data' => RequestLayanan::all()]);
     }
 
     public function destroy($id)
     {
-        $base = Layanan::find($id);
+        $base = RequestLayanan::find($id);
         if ($base) {
             $base->delete();
             return response()->json([
@@ -76,16 +68,16 @@ class LayananController extends Controller
 
     public function edit($id)
     {
-        $ReferensiLayanan = Layanan::find($id);
+        $RequestLayanan =RequestLayanan::find($id);
         return response()->json([
             'success' => true,
-            'data' => $ReferensiLayanan
+            'data' => $RequestLayanan
         ]);
     }
 
     public function update(Request $request, $id)
     {
-        $base = Layanan::find($id);
+        $base = RequestLayanan::find($id);
         if ($base) {
             $base->update($request->all());
 
@@ -99,6 +91,4 @@ class LayananController extends Controller
             ]);
         }
     }
-
-    
 }

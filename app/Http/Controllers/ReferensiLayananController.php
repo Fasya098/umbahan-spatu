@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\ReferensiLayanan;
+use App\Models\RequestLayanan;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
 use App\Models\Role;
@@ -90,5 +91,26 @@ class ReferensiLayananController extends Controller
                 'message' => 'gagal mengubah'
             ]);
         }
+    }
+
+    public function terima(Request $request)
+    {
+        $validatedData = $request->validate([
+            'request_nama_layanan' => 'required|string',
+        ]);
+    
+        // Membuat data baru di ReferensiLayanan
+        $layanan = ReferensiLayanan::create([
+            'nama_layanan' => $validatedData['request_nama_layanan'],
+        ]);
+    
+        // Mencari dan menghapus data pada RequestLayanan yang memiliki nama layanan yang diterima
+        $requestLayanan = RequestLayanan::where('request_nama_layanan', $validatedData['request_nama_layanan'])->first();
+    
+        if ($requestLayanan) {
+            $requestLayanan->delete();
+        }
+    
+        return response()->json(['message' => 'Layanan diterima dan data request dihapus', 'data' => $layanan], 200);
     }
 }

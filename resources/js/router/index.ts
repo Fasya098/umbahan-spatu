@@ -104,6 +104,16 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: "/dashboard/master/request/layanan",
+                name: "dashboard.master.request.layanan",
+                component: () =>
+                    import("@/pages/dashboard/master/request/layanan/Index.vue"),
+                meta: {
+                    pageTitle: "Request Layanan",
+                    breadcrumbs: ["Master", "Request Layanan"],
+                },
+            },
+            {
                 path: "/dashboard/master/layanan",
                 name: "dashboard.master.layanan",
                 component: () =>
@@ -121,6 +131,16 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     pageTitle: "Terima",
                     breadcrumbs: ["Master", "Terima"],
+                },
+            },
+            {
+                path: "/dashboard/master/terima/layanan",
+                name: "dashboard.master.terima.layanan",
+                component: () =>
+                    import("@/pages/dashboard/master/terima/layanan/Index.vue"),
+                meta: {
+                    pageTitle: "Terima Layanan",
+                    breadcrumbs: ["Master", "Terima Layanan"],
                 },
             },
         ],
