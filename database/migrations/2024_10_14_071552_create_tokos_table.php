@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('user_id')->nullable();
             $table->string('nama_toko');
             $table->string('foto_toko');
-            $table->string('deskripsi');
+            $table->longText('deskripsi');
             $table->string('alamat');
             $table->string('nomor_telepon');
             $table->timestamps();

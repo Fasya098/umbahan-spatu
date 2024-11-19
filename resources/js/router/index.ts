@@ -151,9 +151,24 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/userpage/Index.vue"),
     },
     {
+        path: "/userpage/store",
+        name: "/userpage/store",
+        component: () => import("@/pages/userpage/Store.vue"),
+    },
+    {
+        path: "/userpage",
+        name: "/userpage",
+        component: () => import("@/pages/userpage/Index.vue"),
+    },
+    {
         path: "/userpage/mitra",
         name: "/userpage/mitra",
         component: () => import("@/pages/userpage/mitra/Index.vue"),
+    },
+    {
+        path: "/userpage/form",
+        name: "/userpage/form",
+        component: () => import("@/pages/userpage/Form.vue"),
     },
     {
         path: "/",

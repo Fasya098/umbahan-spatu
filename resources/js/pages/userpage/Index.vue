@@ -22,7 +22,15 @@
           <img :src="getImageUrl(shoe.foto_toko)" alt="Sepatu" class="shoe-image">
           <div class="shoe-info">
             <h3>{{ shoe.nama_toko }}</h3>
-            <p>Jarak: 5,1km</p>
+            <p>Alamat: {{ shoe.alamat }}</p>
+            <div style="display: flex; flex-direction: row;">
+              <div>
+                <p style="margin-top: 10px;">Jarak: 5,1km</p>
+              </div>
+              <div>
+                <button class="btn btn-info" style="margin-left: 12px;" @click="navigateToStore">Lihat Toko</button>
+              </div>
+            </div>
           </div>
         </div>
         <!-- Tampilkan pesan jika data belum ada -->
@@ -75,6 +83,10 @@ const getImageUrl = (path: string) => {
   return path ? `/storage/${path}` : '/placeholder-shoe.jpg';
 };
 
+const navigateToStore = () => {
+  router.push('/userpage/store');
+};
+
 // Panggil API saat komponen di-mount
 onMounted(() => {
   getShoesData();
@@ -121,7 +133,7 @@ onMounted(() => {
   margin-bottom: 1.5rem;
   max-width: 220px;
   /* Max width agar berbentuk persegi panjang */
-  max-height: 320px;
+  max-height: 380px;
   /* Max height agar berbentuk persegi panjang ke bawah */
 }
 

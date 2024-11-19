@@ -40,14 +40,14 @@ const formRef = ref();
 
 function getEdit() {
     block(document.getElementById("form-user"));
-        ApiService.get(`master/toko/edit/${user.id}`)
-            .then(({ data }) => {
-                users.value = data.data;
-                foto_toko.value = data.data.foto_toko ? ["/storage/" + data.data.foto_toko] : [];
-            })
-            .finally(() => {
-                unblock(document.getElementById("form-user"));
-            });
+    ApiService.get(`master/toko/edit/${user.id}`)
+        .then(({ data }) => {
+            users.value = data.data;
+            foto_toko.value = data.data.foto_toko ? ["/storage/" + data.data.foto_toko] : [];
+        })
+        .finally(() => {
+            unblock(document.getElementById("form-user"));
+        });
 }
 
 function submit() {
@@ -69,8 +69,8 @@ function submit() {
         formData.append("foto_toko", foto_toko.value[0].file);
     }
 
- // Tambahkan user_id yang diambil dari /auth/me
- if (user.id) {
+    // Tambahkan user_id yang diambil dari /auth/me
+    if (user.id) {
         formData.append("user_id", user.id);
     }
     // if (props.selected) {
@@ -113,7 +113,7 @@ const roles = computed(() =>
 );
 
 onMounted(() => {
-    getEdit(); 
+    getEdit();
 });
 
 
@@ -128,13 +128,7 @@ watch(
 </script>
 
 <template>
-    <VForm
-        class="form card mb-10"
-        @submit="submit"
-        :validation-schema="formSchema"
-        id="form-user"
-        ref="formRef"
-    >
+    <VForm class="form card mb-10" @submit="submit" :validation-schema="formSchema" id="form-user" ref="formRef">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Profile Details</h2>
             <!-- <button
@@ -154,14 +148,8 @@ watch(
                         <label class="form-label fw-bold fs-6 required">
                             Nama Toko
                         </label>
-                        <Field
-                            class="form-control form-control-lg form-control-solid"
-                            type="text"
-                            name="nama_toko"
-                            autocomplete="off"
-                            v-model="users.nama_toko"
-                            placeholder="Masukkan Nama"
-                        />
+                        <Field class="form-control form-control-lg form-control-solid" type="text" name="nama_toko"
+                            autocomplete="off" v-model="users.nama_toko" placeholder="Masukkan Nama" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="nama_toko" />
@@ -176,14 +164,9 @@ watch(
                         <label class="form-label fw-bold fs-6 required">
                             Deskripsi
                         </label>
-                        <Field
-                            class="form-control form-control-lg form-control-solid"
-                            type="text"
-                            name="deskripsi"
-                            autocomplete="off"
-                            v-model="users.deskripsi"
-                            placeholder="Masukkan deskripsi"
-                        />
+                        <Field as="textarea" rows="4" class="form-control form-control-lg form-control-solid"
+                            name="deskripsi" autocomplete="off" v-model="users.deskripsi"
+                            placeholder="Masukkan deskripsi" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="deskripsi" />
@@ -198,14 +181,8 @@ watch(
                         <label class="form-label fw-bold fs-6">
                             alamat
                         </label>
-                        <Field
-                            class="form-control form-control-lg form-control-solid"
-                            type="text"
-                            name="alamat"
-                            autocomplete="off"
-                            v-model="users.alamat"
-                            placeholder="Masukkan alamat"
-                        />
+                        <Field class="form-control form-control-lg form-control-solid" type="text" name="alamat"
+                            autocomplete="off" v-model="users.alamat" placeholder="Masukkan alamat" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="alamat" />
@@ -220,14 +197,8 @@ watch(
                         <label class="form-label fw-bold fs-6">
                             Nomor Telepon
                         </label>
-                        <Field
-                            class="form-control form-control-lg form-control-solid"
-                            type="text"
-                            name="nomor_telepon"
-                            autocomplete="off"
-                            v-model="users.nomor_telepon"
-                            placeholder="No Telepon"
-                        />
+                        <Field class="form-control form-control-lg form-control-solid" type="text" name="nomor_telepon"
+                            autocomplete="off" v-model="users.nomor_telepon" placeholder="No Telepon" />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="nomor_telepon" />
@@ -243,12 +214,8 @@ watch(
                             Foto Toko
                         </label>
                         <!--begin::Input-->
-                        <file-upload
-                            :files="foto_toko"
-                            :accepted-file-types="fileTypes"
-                            required
-                            v-on:updatefiles="(file) => (foto_toko = file)"
-                        ></file-upload>
+                        <file-upload :files="foto_toko" :accepted-file-types="fileTypes" required
+                            v-on:updatefiles="(file) => (foto_toko = file)"></file-upload>
                         <!--end::Input-->
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">

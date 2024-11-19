@@ -191,7 +191,7 @@ watch(
                             name="harga"
                             autocomplete="off"
                             v-model="data.harga"
-                            placeholder="Masukkan No Telepon"
+                            placeholder="Masukkan Harga"
                         />
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">

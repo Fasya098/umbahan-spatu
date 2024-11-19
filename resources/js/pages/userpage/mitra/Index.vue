@@ -34,8 +34,8 @@
 
               <div class="mb-3">
                 <label for="password_confirmation" class="form-label">Password Konfirmasi</label>
-                <input type="password" class="form-control" id="password_confirmation" v-model="form.password_confirmation"
-                  placeholder="Masukkan Password Konfirmasi" required />
+                <input type="password" class="form-control" id="password_confirmation"
+                  v-model="form.password_confirmation" placeholder="Masukkan Password Konfirmasi" required />
               </div>
 
               <button type="submit" class="btn btn-primary w-100">Submit</button>
@@ -60,20 +60,21 @@ const form = reactive({
   name: '',
   email: '',
   phone: '',
-  password: ''
+  password: '',
+  password_confirmation: '',
 })
 
 const submitForm = async () => {
   try {
     const response = await axios.post('/userpage/store', form);
     console.log(response.data);
-    
+
     // Menggunakan SweetAlert2 untuk menampilkan alert sukses
-    const {isConfirmed} = await Swal.fire({
-      icon: 'sukses',
+    const { isConfirmed } = await Swal.fire({
+      icon: 'success',
       title: 'Pendaftaran sedang ditinjau!',
       text: 'Tunggu wa masuk pada hp anda',
-      confirmButtonText: 'Ok',
+      confirmButtonText: 'Oke',
     });
 
     if (isConfirmed) {
@@ -83,17 +84,16 @@ const submitForm = async () => {
     // Kamu bisa menambahkan logika untuk melakukan tindakan setelah sukses (misalnya redirect)
   } catch (error) {
     console.error(error);
-    
+
     // Menggunakan SweetAlert2 untuk menampilkan alert kesalahan
     await Swal.fire({
       icon: 'error',
       title: 'Terjadi kesalahan!',
       text: 'Silakan coba lagi.',
-      confirmButtonText: 'Ok'
+      confirmButtonText: 'Oke'
     });
   }
 }
-
 </script>
 
 <style scoped>
@@ -109,11 +109,13 @@ const submitForm = async () => {
   height: 100vh;
   width: 100vw;
 }
+
 #base {
-  display : flex;
+  display: flex;
   align-items: center;
   justify-content: center;
 }
+
 .card {
   border-radius: 10px;
 }
@@ -131,6 +133,4 @@ const submitForm = async () => {
 .form-control {
   border-radius: 8px;
 }
-
-
 </style>
