@@ -32,7 +32,7 @@
                   placeholder="Masukkan Password" required />
               </div>
 
-              <div class="mb-3">
+              <div class="mb-6">
                 <label for="password_confirmation" class="form-label">Password Konfirmasi</label>
                 <input type="password" class="form-control" id="password_confirmation"
                   v-model="form.password_confirmation" placeholder="Masukkan Password Konfirmasi" required />
@@ -102,7 +102,7 @@ const submitForm = async () => {
 }
 
 .background {
-  background-image: url('/media/misc/bg-sepatu.jpg');
+  background-image: url('/media/misc/bg-sepatu.png');
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

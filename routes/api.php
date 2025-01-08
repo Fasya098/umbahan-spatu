@@ -9,8 +9,10 @@ use App\Http\Controllers\TokoController;
 use App\Http\Controllers\MitraController;
 use App\Http\Controllers\TerimaController;
 use App\Http\Controllers\LayananController;
+use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ReferensiLayananController;
 use App\Http\Controllers\RequestLayananController;
+use App\Http\Controllers\UserpageController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -64,14 +66,15 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
         Route::middleware('can:master-pesanan')->group(function () {
             Route::post('pesanan', [PesananController::class, 'index']);
+            Route::post('pesanan/store', [PesananController::class, 'store']);
         });
 
         Route::middleware('can:master-toko')->group(function () {
             Route::post('/toko', [TokoController::class, 'index']);
             Route::get('/toko/get', [TokoController::class, 'show']);
             Route::post('/toko/store', [TokoController::class, 'add']);
-            Route::get('/toko/edit/{id}', [TokoController::class, 'edit']); 
-            Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']); 
+            Route::get('/toko/edit/{id}', [TokoController::class, 'edit']);
+            Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']);
         });
 
         Route::middleware('can:master-layanan')->group(function () {
@@ -80,7 +83,16 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::post('/layanan/store', [LayananController::class, 'store']);
             Route::get('/layanan/edit/{id}', [LayananController::class, 'edit']);
             Route::put('/layanan/update/{id}', [LayananController::class, 'update']);
-            Route::delete('/layanan/destroy/{id}', [LayananController::class, 'destroy']); 
+            Route::delete('/layanan/destroy/{id}', [LayananController::class, 'destroy']);
+        });
+
+        Route::middleware('can:master-promo')->group(function () {
+            Route::post('/promo', [PromoController::class, 'index']);
+            Route::get('/promo/get', [PromoController::class, 'get']);
+            Route::post('/promo/store', [PromoController::class, 'store']);
+            Route::get('/promo/edit/{id}', [PromoController::class, 'edit']);
+            Route::put('/promo/update/{id}', [PromoController::class, 'update']);
+            Route::delete('/promo/destroy/{id}', [PromoController::class, 'destroy']);
         });
 
         Route::middleware('can:master-terima')->group(function () {
@@ -109,7 +121,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     });
 });
 
-    Route::prefix('userpage')->group(function() {
-        Route::post('/store', [MitraController::class, 'store']);
-        Route::get('/toko/get', [TokoController::class, 'show']);
-    });
+Route::prefix('userpage')->group(function () {
+    Route::post('/store', [UserpageController::class, 'store']);
+    Route::get('/toko/get', [UserpageController::class, 'show']);
+    Route::get('/toko/shiw/{uuid}', [UserpageController::class, 'shiw']);
+    Route::get('/toko/shaw/{userId}', [UserpageController::class, 'shaw']);
+    Route::get('/toko/ahay/{tokoUuid}', [UserpageController::class, 'ahay']);
+});

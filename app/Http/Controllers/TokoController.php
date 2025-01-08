@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Toko;
 use App\Http\Requests\StoreUserRequest;
 use App\Http\Requests\UpdateUserRequest;
+use App\Models\Layanan;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
@@ -67,6 +68,18 @@ class TokoController extends Controller
     
     public function show () {
         return response()->json(Toko::all());
+    }
+
+    public function shiw ($tokoUuid) {
+        $data = Toko::where('uuid', $tokoUuid)->get();
+
+        return response()->json($data);
+    }
+
+    public function shaw () {
+        $data = Toko::with('user')->get();
+
+        return response()->json($data);
     }
 
     public function edit($id)

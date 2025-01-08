@@ -124,6 +124,16 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
+                path: "/dashboard/master/promo",
+                name: "dashboard.master.promo",
+                component: () =>
+                    import("@/pages/dashboard/master/promo/Index.vue"),
+                meta: {
+                    pageTitle: "Promo",
+                    breadcrumbs: ["master", "Promo"],
+                },
+            },
+            {
                 path: "/dashboard/master/terima",
                 name: "dashboard.master.terima",
                 component: () =>
@@ -151,8 +161,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/userpage/Index.vue"),
     },
     {
-        path: "/userpage/store",
-        name: "/userpage/store",
+        path: "/userpage/store/:uuid",
+        name: "userpage.store",
         component: () => import("@/pages/userpage/Store.vue"),
     },
     {
@@ -166,8 +176,8 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/userpage/mitra/Index.vue"),
     },
     {
-        path: "/userpage/form",
-        name: "/userpage/form",
+        path: "/userpage/form/:uuid/:userId",
+        name: "userpage.form",
         component: () => import("@/pages/userpage/Form.vue"),
     },
     {

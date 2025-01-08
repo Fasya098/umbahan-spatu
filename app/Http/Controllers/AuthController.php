@@ -4,15 +4,19 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Models\User;
 
 class AuthController extends Controller
 {
     public function me()
     {
+        $user = User::with(['toko'])->where('id', auth()->user()->id)->first();
         return response()->json([
-            'user' => auth()->user()
+            'user' => $user
         ]);
     }
+
+
 
     public function login(Request $request)
     {

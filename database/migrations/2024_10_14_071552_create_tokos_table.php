@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('tokos', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->string('user_id')->nullable();
             $table->string('nama_toko');
             $table->string('foto_toko');

@@ -1,28 +1,27 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router';
+import { useRouter, useRoute } from 'vue-router';
 
-const shoes = ref([]); // Data sepatu
+const tokos = ref([]);
 const router = useRouter();
+const route = useRoute();
+const uuid = route.params.uuid;
 
-// Fungsi untuk navigasi ke halaman form dengan menyertakan ID sepatu
-const goToForm = (id: number) => {
-    router.push({ path: '/userpage/form', query: { shoeId: id } });
+function goToForm(uuid, userId) {
+    router.push({ name: 'userpage.form', params: { uuid, userId } });
 };
 
-// Fungsi untuk kembali ke halaman sebelumnya
 function goBack() {
     router.go(-1);
 }
 
-// Fungsi untuk mendapatkan data sepatu dari API
 const getShoesData = async () => {
     try {
-        const response = await axios.get('/userpage/toko/get');
-        shoes.value = response.data;
+        const response = await axios.get(`/userpage/toko/shiw/${route.params.uuid}`);
+        tokos.value = response.data;
     } catch (error) {
-        console.error('Error fetching shoes data:', error);
+        console.error('Error mengambil data toko:', error);
     }
 };
 
@@ -44,41 +43,72 @@ onMounted(() => {
         </div>
     </nav>
 
-    <div class="p-10" style="height: 100vh; width: 100vw;">
-        <div class="card rounded-3 w-100 h-100 p-4">
-            <div class="flex-col" v-if="shoes.length" v-for="shoe in shoes" :key="shoe.id">
-                <div class="d-flex flex-row justify-content-between">
-                    <div class="w-40 h-80 rounded-3" style="width: 200px; height : 250px">
-                        <img :src="getImageUrl(shoe.foto_toko)" alt="Sepatu" style="border-radius: 10px;"
-                            class="shoe-image">
-                    </div>
-                    <div class="w-40 h-80 p-5 rounded-3" style="width: 950px; height : 300px">
-                        <div class="text-center h-20">
-                            <h1>{{ shoe.nama_toko }}</h1>
+    <div class="container-fluid " style="background-color: #f8f9fa; min-height: 100vh;">
+        <div class="container">
+            <div class="card border-0 p-4 rounded-4 shadow-lg bg-white">
+                <div v-if="tokos.length" v-for="toko in tokos" :key="toko.uuid" class="store-card">
+                    <!-- Store Header -->
+                    <div class="row g-4 align-items-stretch">
+                        <!-- Store Image -->
+                        <div class="col-lg-4 col-md-5">
+                            <div class="rounded-4 overflow-hidden shadow-sm h-100">
+                                <img :src="getImageUrl(toko.foto_toko)" alt="Store Image" class="img-fluid w-100 h-100"
+                                    style="object-fit: cover; min-height: 300px;">
+                            </div>
                         </div>
-                        <br>
-                        <div class="text-center h-20">
-                            {{ shoe.deskripsi }}
-                        </div>
-                    </div>
-                </div>
-                <div class="d-flex flex-row justify-content-between">
-                    <div class="d-flex flex-row justify-content-between">
-                        <div class="rounded-3" style="height: auto; width: 350px;">
-                            <h5>No telepon : {{ shoe.nomor_telepon }}</h5>
-                            <h5>Alamat : {{ shoe.alamat }}</h5>
-                            <div style="margin-top: 59px;">
-                                <button class="btn btn-danger" @click="goBack">Kembali</button>
+
+                        <!-- Store Information -->
+                        <div class="col-lg-8 col-md-7">
+                            <div class="h-100 p-4 bg-light rounded-4 shadow">
+                                <div class="d-flex flex-column h-100">
+                                    <!-- Store Name -->
+                                    <h2 class="mb-3 text-primary fw-bold">{{ toko.nama_toko }}</h2>
+
+                                    <!-- Store Description -->
+                                    <div class="mb-4">
+                                        <p class="text-muted mb-0" style="line-height: 1.6; font-size: 1.4rem;">
+                                            {{ toko.deskripsi }}
+                                        </p>
+                                    </div>
+
+                                    <!-- Contact Details -->
+                                    <div class="mt-auto">
+                                        <div class="d-flex flex-column gap-2">
+                                            <div class="d-flex align-items-center">
+                                                <i class="bi bi-telephone-fill me-2 text-primary"></i>
+                                                <span class="fw-medium" style="font-size: 1.2rem;">{{ toko.nomor_telepon }}</span>
+                                            </div>
+                                            <div class="d-flex align-items-start">
+                                                <i class="bi bi-geo-alt-fill me-2 mt-2 text-primary"></i>
+                                                <span class="fw-medium" style="font-size: 1.2rem;">{{ toko.alamat }}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                    <div class="rounded-3" style="height: 50px; width: 150px; margin-top: 100px;">
-                        <button class="btn btn-info" @click="goToForm(shoe.id)">Pesan Disini</button>
+
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between align-items-center mt-10 px-2">
+                        <button class="btn btn-danger px-4 py-3 rounded-3 shadow-sm" @click="goBack">
+                            <i class="las la-angle-left" style="color: white;"></i>
+                            Kembali
+                        </button>
+                        <button class="btn btn-primary px-4 py-3 rounded-3 shadow-sm"
+                            @click="goToForm(toko.uuid, toko.user_id)">
+                            <i class="bi bi-cart-plus me-2"></i>
+                            Pesan Disini
+                        </button>
                     </div>
+
+                    <!-- Divider -->
+                    <hr class="my-4 opacity-25">
                 </div>
             </div>
         </div>
     </div>
+
 </template>
 
 <style scoped>

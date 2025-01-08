@@ -63,6 +63,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         route: "/dashboard/master/layanan",
                     },
                     {
+                        heading: "Promo",
+                        name: "master-promo",
+                        route: "/dashboard/master/promo",
+                    },
+                    {
                         heading: "Pesanan",
                         name: "master-pesanan",
                         route: "/dashboard/master/pesanan",

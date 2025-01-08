@@ -21,7 +21,7 @@
         <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
             <li class="nav-item">
                 <a
-                    class="nav-link active"
+                    class="nav-link active text-primary"
                     data-bs-toggle="tab"
                     href="#with-email"
                     >Email</a
@@ -42,9 +42,7 @@
             </div>
         </div>
 
-        <div class="border-bottom border-gray-300 w-100 mt-5 mb-10"></div>
-
-        <!--begin::Link-->
+        <!-- begin::Link-->
         <!-- <div class="text-gray-400 fw-semobold fs-4 text-center">
             {{ $t('login.daftar_label') }}
 
@@ -52,7 +50,7 @@
                 {{ $t('login.daftar') }}
             </router-link>
         </div> -->
-        <!--end::Link-->
+        <!--end::Link -->
     </div>
     <!--end::Form-->
 </template>

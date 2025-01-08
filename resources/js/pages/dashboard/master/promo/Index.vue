@@ -5,8 +5,6 @@ import Form from "./Form.vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { User } from "@/types";
 import { currency } from "@/libs/utils";
-import axios from "@/libs/axios";
-import { toast } from "vue3-toastify";
 
 const column = createColumnHelper<User>();
 const paginateRef = ref<any>(null);
@@ -17,67 +15,45 @@ const { delete: deleteUser } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
-const handleTerima = async (requestNamaLayanan) => {
-    try {
-        const response = await axios.post('/master/referensi/layanan/terima', {
-            request_nama_layanan: requestNamaLayanan,
-        });
-        // Menangani response sukses
-        console.log(response.data);
-        toast.success('Layanan Diterima!');
-        refresh();
-    } catch (error) {
-        // Menangani error
-        console.error(error);
-        toast.error('Error menerima layanan');
-    }
-};
-
-const handleTolak = async (requestNamaLayanan) => {
-    try {
-        const response = await axios.post('/master/users/tolak', {
-            request_nama_layanan: requestNamaLayanan,
-        });
-        // Menangani response sukses
-        console.log(response.data);
-        toast.success('Mitra Ditolak!');
-        refresh();
-    } catch (error) {
-        // Menangani error
-        console.error(error);
-        toast.error('Error menolak mitra');
-    }
-};
-
 const columns = [
     column.accessor("no", {
         header: "#",
     }),
-    column.accessor("request_nama_layanan", {
-        header: "Nama Layanan",
+    column.accessor("toko.nama_toko", {
+        header: "Nama",
+    }),
+    column.accessor("nama_promo", {
+        header: "Nama Promo",
+    }),
+    column.accessor("harga", {
+        header: "Harga",
+        cell: (cell) => currency(cell.getValue() ?? 0)
     }),
     column.accessor("id", {
         header: "Aksi",
-        cell: (cell) => {
-            return h("div", { class: "d-flex gap-2" }, [ // Pastikan untuk mengembalikan elemen
+        cell: (cell) =>
+            h("div", { class: "d-flex gap-2" }, [
                 h(
                     "button",
                     {
-                        class: "btn btn-sm btn-icon btn-success",
-                        onClick: () => handleTerima(cell.row.original.request_nama_layanan),
+                        class: "btn btn-sm btn-icon btn-info",
+                        onClick: () => {
+                            selected.value = cell.getValue();
+                            openForm.value = true;
+                        },
                     },
-                    h("i", { class: "la la-check fs-2" })
+                    h("i", { class: "la la-pencil fs-2" })
                 ),
                 h(
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () => handleTolak, // Jika perlu mengirim user_id
+                        onClick: () =>
+                            deleteUser(`/master/layanan/destroy/${cell.getValue()}`),
                     },
-                    h("i", { class: "la la-times fs-2" })
+                    h("i", { class: "la la-trash fs-2" })
                 ),
-            ]);
-        },
+            ]),
     }),
 ];
 
@@ -101,7 +77,7 @@ watch(openForm, (val) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Terima Layanan</h2>
+            <h2 class="mb-0">Promo</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -116,7 +92,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-users"
-                url="/master/request/layanan"
+                url="/master/promo"
                 :columns="columns"
             ></paginate>
         </div>

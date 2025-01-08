@@ -7,7 +7,7 @@
         <router-link to="/maps" class="nav-item">Maps</router-link>
       </div>
       <div style="justify-content: flex-end;">
-        <Button @click="navigateToMitra" style="justify-content: flex-end">
+        <Button class="btn btn-info" @click="navigateToMitra" style="justify-content: flex-end">
           Bergabung dengan kami
         </Button>
       </div>
@@ -16,25 +16,24 @@
     <!-- Content -->
     <main class="content">
       <div class="card-container">
-        <!-- Cek apakah data sudah ada -->
-        <div v-if="shoes.length" v-for="shoe in shoes" :key="shoe.id" class="shoe-card">
-          <!-- Gabungkan base URL dengan path foto_toko -->
-          <img :src="getImageUrl(shoe.foto_toko)" alt="Sepatu" class="shoe-image">
+        <div v-if="tokos.length" v-for="toko in tokos" :key="toko.uuid" class="shoe-card">
+          <img :src="getImageUrl(toko.foto_toko)" alt="Sepatu" class="shoe-image">
           <div class="shoe-info">
-            <h3>{{ shoe.nama_toko }}</h3>
-            <p>Alamat: {{ shoe.alamat }}</p>
+            <h3>{{ toko.nama_toko }}</h3>
+            <p>Alamat: {{ toko.alamat }}</p>
             <div style="display: flex; flex-direction: row;">
               <div>
                 <p style="margin-top: 10px;">Jarak: 5,1km</p>
               </div>
               <div>
-                <button class="btn btn-info" style="margin-left: 12px;" @click="navigateToStore">Lihat Toko</button>
+                <button class="btn btn-info" style="margin-left: 12px;" @click="navigateToStore(toko.uuid)">Lihat
+                  Toko</button>
               </div>
             </div>
           </div>
         </div>
         <!-- Tampilkan pesan jika data belum ada -->
-        <p v-else>Loading shoes data...</p>
+        <p class="d-flex justify-content-center" v-else>Loading data...</p>
       </div>
     </main>
 
@@ -65,14 +64,14 @@ const navigateToMitra = () => {
 };
 
 // State untuk menampung data sepatu
-const shoes = ref([]);
+const tokos = ref([]);
 
 // Fungsi untuk mendapatkan data sepatu dari API
 const getShoesData = async () => {
   try {
     const response = await axios.get('/userpage/toko/get');
     console.log(response.data); // Cek data di sini
-    shoes.value = response.data;
+    tokos.value = response.data;
   } catch (error) {
     console.error('Error fetching shoes data:', error);
   }
@@ -83,8 +82,11 @@ const getImageUrl = (path: string) => {
   return path ? `/storage/${path}` : '/placeholder-shoe.jpg';
 };
 
-const navigateToStore = () => {
-  router.push('/userpage/store');
+function navigateToStore(uuid) {
+  router.push({
+    name: 'userpage.store',
+    params: { uuid }
+  });
 };
 
 // Panggil API saat komponen di-mount

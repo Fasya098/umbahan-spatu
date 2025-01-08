@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('layanans', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->foreignId('user_id')->nullable()->references('id')->on('users')->onDelete('cascade');
             $table->foreignId('referensi_layanan_id')->nullable()->references('id')->on('referensi_layanans')->onDelete('cascade');
             $table->double('harga');

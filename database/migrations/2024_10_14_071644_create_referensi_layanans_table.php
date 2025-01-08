@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('referensi_layanans', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->string('nama_layanan');
             $table->timestamps();
         });

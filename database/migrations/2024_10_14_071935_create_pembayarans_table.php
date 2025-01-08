@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('pembayarans', function (Blueprint $table) {
             $table->id();
+            $table->uuid()->unique();
             $table->foreignId('pesanans_id')->references('id')->on('pesanans')->onDelete('cascade');
             $table->string('metode_pembayaran');
             $table->string('status');

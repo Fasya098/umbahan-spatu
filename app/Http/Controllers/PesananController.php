@@ -23,4 +23,44 @@ class PesananController extends Controller
 
         return response()->json($data);
     }
+
+    public function store(Request $request)
+{
+    // Validasi data dari request
+    $validatedData = $request->validate([
+        'toko_id' => 'required|integer|exists:tokos,id',
+        'tanggal_pesanan' => 'required|date',
+        'status' => 'required|integer',
+        'total_harga' => 'required|numeric',
+        'sepatu' => 'required|array',
+        'sepatu.*.layanan_id' => 'required|integer|exists:layanans,id',
+        'sepatu.*.brand_sepatu' => 'required|string',
+        'sepatu.*.warna_sepatu' => 'required|string',
+        'sepatu.*.promo_id' => 'nullable|integer|exists:promos,id',
+        'sepatu.*.foto_sepatu' => 'nullable',
+    ]);
+
+    // Simpan data pesanan
+    $pesanan = Pesanan::create([
+        'toko_id' => $validatedData['toko_id'],
+        'tanggal_pesanan' => $validatedData['tanggal_pesanan'],
+        'status' => $validatedData['status'],
+        'total_harga' => $validatedData['total_harga'],
+    ]);
+
+    // Simpan masing-masing data sepatu
+    foreach ($validatedData['sepatu'] as $sepatu) {
+        $pesanan->sepatu()->create([
+            'layanan_id' => $sepatu['layanan_id'],
+            'promo_id' => $sepatu['promo_id'] ?? null,
+            'foto_sepatu' => $sepatu['foto_sepatu'] ?? null,
+            'brand_sepatu' => $sepatu['brand_sepatu'],
+            'warna_sepatu' => $sepatu['warna_sepatu'],
+        ]);
+    }
+
+    return response()->json(['message' => 'Pesanan berhasil disimpan!'], 201);
+}
+
+    
 }

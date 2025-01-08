@@ -1,14 +1,14 @@
 <template>
     <VForm class="form w-100" @submit="submit" :validation-schema="login">
         <!--begin::Input group-->
-        <div class="fv-row mb-10">
+        <div class="fv-row mb-5">
             <!--begin::Label-->
             <label class="form-label fs-6 fw-bold">Email</label>
             <!--end::Label-->
 
             <!--begin::Input-->
             <Field tabindex="1" class="form-control form-control-lg form-control-solid" type="text" name="email"
-                autocomplete="off" v-model="data.email" />
+                autocomplete="off" v-model="data.email"  style="margin-bottom: 10px;"/>
             <!--end::Input-->
             <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
@@ -27,9 +27,9 @@
                 <!--end::Label-->
 
                 <!--begin::Link-->
-                <!-- <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
-              Forgot Password ?
-            </router-link> -->
+                <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
+                    Forgot Password ?
+                </router-link>
                 <!--end::Link-->
             </div>
             <!--end::Wrapper-->
@@ -37,8 +37,8 @@
             <!--begin::Input-->
             <div class="position-relative mb-3">
                 <!--begin::Input-->
-                <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password" name="password"
-                    v-model="data.password" autocomplete="off" />
+                <Field tabindex="2" class="form-control form-control-lg form-control-solid" type="password"
+                    name="password" v-model="data.password" autocomplete="off" />
                 <!--end::Input-->
 
                 <!--begin::Visibility toggle-->

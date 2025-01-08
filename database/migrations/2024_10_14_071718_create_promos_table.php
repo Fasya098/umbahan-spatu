@@ -13,9 +13,10 @@ return new class extends Migration
     {
         Schema::create('promos', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('tokos_id')->references('id')->on('tokos')->onDelete('cascade');
+            $table->uuid()->unique();
+            $table->foreignId('toko_id')->references('id')->on('tokos')->onDelete('cascade');
             $table->string('nama_promo');
-            $table->float('diskon');
+            $table->double('harga');
             $table->date('tanggal_mulai');
             $table->date('tanggal_berakhir');
             $table->timestamps();

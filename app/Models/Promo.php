@@ -2,20 +2,26 @@
 
 namespace App\Models;
 
+use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Promo extends Model
 {
-    use HasFactory;
+    use HasFactory, Uuid;
 
     protected $table = "promos";
     
     protected $fillable = [
-        'tokos_id',
+        'toko_id',
         'nama_promo',
-        'diskon',
+        'harga',
         'tanggal_mulai',
         'tanggal_berakhir',
     ];
+
+    public function Toko () 
+    {
+        return $this->belongsTo(Toko::class);
+    }
 }

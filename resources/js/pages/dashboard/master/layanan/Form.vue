@@ -163,7 +163,7 @@ watch(
                             v-model="data.referensi_layanan_id"
                         >
                             <select2
-                                placeholder="Pilih user"
+                                placeholder="Pilih Layanan"
                                 class="form-select-solid"
                                 :options="referensiLayanans"
                                 name="referensi_layanan_id"
