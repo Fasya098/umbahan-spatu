@@ -24,7 +24,7 @@ const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const toko = ref<any>([]);
 const formRef = ref();
 const { user } = useAuthStore()
-console.log("Toko ID:", user.toko?.id);
+console.log("Toko ID:", user);
 const route = useRoute();
 const formSchema = Yup.object().shape({
     nama_promo: Yup.string().required("Nama promo harus diisi"),
@@ -95,10 +95,12 @@ function submit() {
 
 onMounted(async () => {
     // console.log(useAuthStore());
+    // useAuthStore()
     if (props.selected) {
         getEdit();
         getToko();
         useToko();
+        useAuthStore();
     }
 });
 
@@ -108,6 +110,7 @@ watch(
         if (props.selected) {
             getEdit();
             getToko();
+            useAuthStore();
         }
     }
 );

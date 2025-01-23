@@ -74,6 +74,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::get('/toko/get', [TokoController::class, 'show']);
             Route::post('/toko/store', [TokoController::class, 'add']);
             Route::get('/toko/edit/{id}', [TokoController::class, 'edit']);
+            Route::put('/toko/update{id}', [TokoController::class, 'update']);
             Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']);
         });
 
@@ -126,5 +127,10 @@ Route::prefix('userpage')->group(function () {
     Route::get('/toko/get', [UserpageController::class, 'show']);
     Route::get('/toko/shiw/{uuid}', [UserpageController::class, 'shiw']);
     Route::get('/toko/shaw/{userId}', [UserpageController::class, 'shaw']);
-    Route::get('/toko/ahay/{tokoUuid}', [UserpageController::class, 'ahay']);
+    Route::get('/toko/ahay/{uuid}', [UserpageController::class, 'ahay']);
+});
+
+Route::prefix('pesanan')->group(function () {
+    Route::post('', [PesananController::class, 'index']);
+    Route::post('/store', [PesananController::class, 'store']);
 });

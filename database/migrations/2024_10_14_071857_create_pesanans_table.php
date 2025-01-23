@@ -19,7 +19,6 @@ return new class extends Migration
             $table->foreignId('promo_id')->nullable()->references('id')->on('promos')->onDelete('cascade');
             $table->string('foto_sepatu');
             $table->string('brand_sepatu');
-            $table->string('warna_sepatu');
             $table->date('tanggal_pesanan');
             $table->enum('status', ['1', '2', '3'])->comment('1=Penjemputan, 2=Pengerjaan, 3=pengiriman');
             $table->double('total_harga');

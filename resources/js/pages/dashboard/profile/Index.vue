@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { block, unblock } from "@/libs/utils";
+import { block, unblock, currency } from "@/libs/utils";
 import { onMounted, ref, watch, computed } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
@@ -57,6 +57,7 @@ function submit() {
     formData.append("deskripsi", users.value.deskripsi);
     formData.append("alamat", users.value.alamat);
     formData.append("nomor_telepon", users.value.nomor_telepon);
+    formData.append("ongkir", users.value.ongkir);
 
     // if (user.value?.password) {
     //     formData.append("password", user.value.password);
@@ -130,7 +131,7 @@ watch(
 <template>
     <VForm class="form card mb-10" @submit="submit" :validation-schema="formSchema" id="form-user" ref="formRef">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Profile Details</h2>
+            <h2 class="mb-0">Profil Toko</h2>
             <!-- <button
                 type="button"
                 class="btn btn-sm btn-light-danger ms-auto"
@@ -153,23 +154,6 @@ watch(
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="nama_toko" />
-                            </div>
-                        </div>
-                    </div>
-                    <!--end::Input group-->
-                </div>
-                <div class="col-md-6">
-                    <!--begin::Input group-->
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6 required">
-                            Deskripsi
-                        </label>
-                        <Field as="textarea" rows="4" class="form-control form-control-lg form-control-solid"
-                            name="deskripsi" autocomplete="off" v-model="users.deskripsi"
-                            placeholder="Masukkan deskripsi" />
-                        <div class="fv-plugins-message-container">
-                            <div class="fv-help-block">
-                                <ErrorMessage name="deskripsi" />
                             </div>
                         </div>
                     </div>
@@ -202,6 +186,39 @@ watch(
                         <div class="fv-plugins-message-container">
                             <div class="fv-help-block">
                                 <ErrorMessage name="nomor_telepon" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <div class="col-md-6">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6">
+                            Ongkir per KM
+                        </label>
+                        <Field class="form-control form-control-lg form-control-solid" type="number" name="ongkir"
+                            autocomplete="off" v-model="users.ongkir" placeholder="Ongkir per KiloMeter" />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="ongkir" />
+                            </div>
+                        </div>
+                    </div>
+                    <!--end::Input group-->
+                </div>
+                <div class="col-md-6">
+                    <!--begin::Input group-->
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">
+                            Deskripsi
+                        </label>
+                        <Field as="textarea" rows="4" class="form-control form-control-lg form-control-solid"
+                            name="deskripsi" autocomplete="off" v-model="users.deskripsi"
+                            placeholder="Masukkan deskripsi toko" />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="deskripsi" />
                             </div>
                         </div>
                     </div>

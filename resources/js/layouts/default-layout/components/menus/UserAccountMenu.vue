@@ -112,14 +112,14 @@ const currentLangugeLocale = computed(() => {
         <!--begin::Menu item-->
         <div class="menu-item px-5 my-1">
             <router-link to="/dashboard/profile" class="menu-link px-5">
-                Profile Toko
+                Profil Toko
             </router-link>
         </div>
         <!--end::Menu item-->
 
         <!--begin::Menu item-->
         <div class="menu-item px-5">
-            <a @click="signOut()" class="menu-link px-5"> Sign Out </a>
+            <a @click="signOut()" class="menu-link px-5"> Keluar </a>
         </div>
         <!--end::Menu item-->
     </div>

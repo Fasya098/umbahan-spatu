@@ -38,8 +38,8 @@ const routes: Array<RouteRecordRaw> = [
                 name: "dashboard.profile",
                 component: () => import("@/pages/dashboard/profile/Index.vue"),
                 meta: {
-                    pageTitle: "Profile Toko",
-                    breadcrumbs: ["Profile-Toko"],
+                    pageTitle: "Profil Toko",
+                    breadcrumbs: ["Profil-Toko"],
                 },
             },
             {

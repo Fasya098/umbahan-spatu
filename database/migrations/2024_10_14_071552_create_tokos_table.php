@@ -20,6 +20,7 @@ return new class extends Migration
             $table->longText('deskripsi');
             $table->string('alamat');
             $table->string('nomor_telepon');
+            $table->double('ongkir');
             $table->timestamps();
         });
     }

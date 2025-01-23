@@ -40,6 +40,7 @@ class TokoController extends Controller
             'nomor_telepon' => 'required',
             'foto_toko' => 'required|image', // Menambahkan validasi untuk file gambar
             'user_id' => 'required',
+            'ongkir' => 'required',
         ]);
     
         // Mengambil data dari request
@@ -112,4 +113,20 @@ class TokoController extends Controller
         }
     }
 
+    public function update(Request $request, $id)
+    {
+        $base = Toko::find($id);
+        if ($base) {
+            $base->update($request->all());
+
+            return response()->json([
+                'status' => 'true',
+                'message' => 'data berhasil diubah'
+            ]);
+        } else {
+            return response([
+                'message' => 'gagal mengubah'
+            ]);
+        }
+    }
 }

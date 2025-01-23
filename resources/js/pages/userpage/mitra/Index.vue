@@ -3,9 +3,17 @@
     <div class="background" id="base">
       <div class="container mt-5">
         <div class="card shadow">
-          <div class="text-center mt-10">
-            <h3>Form Pendaftaran Mitra</h3>
+          <div class="">
           </div>
+          <div class="d-flex align-items-center px-10 mt-10">
+            <button class="btn btn-danger px-3 py-2 rounded-3 shadow-sm " @click="goBack">
+              <i class="las la-angle-left" style="color: white; margin-left: 3px;"></i>
+            </button>
+            <div class="text-center flex-grow-1">
+              <h3 class="mb-0">Form Pendaftaran Mitra</h3>
+            </div>
+          </div>
+
           <div class="card-body">
             <form @submit.prevent="submitForm">
               <div class="mb-3">
@@ -93,6 +101,10 @@ const submitForm = async () => {
       confirmButtonText: 'Oke'
     });
   }
+}
+
+function goBack() {
+    window.history.back();
 }
 </script>
 

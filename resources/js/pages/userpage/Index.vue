@@ -33,7 +33,7 @@
           </div>
         </div>
         <!-- Tampilkan pesan jika data belum ada -->
-        <p class="d-flex justify-content-center" v-else>Loading data...</p>
+        <p class="" style="display: flex; justify-content: center; align-items: center;" v-else>Loading data...</p>
       </div>
     </main>
 
@@ -118,6 +118,7 @@ onMounted(() => {
 
 .content {
   padding: 2rem;
+  min-height: 50vh;
 }
 
 .card-container {

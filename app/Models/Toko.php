@@ -18,7 +18,8 @@ class Toko extends Model
         'foto_toko',
         'deskripsi',
         'alamat',
-        'nomor_telepon'
+        'nomor_telepon',
+        'ongkir',
     ];
 
     public function user () {

@@ -27,9 +27,9 @@ class UserpageController extends Controller
             'email' => $request->email,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role_id' => 2, 
+            'role_id' => 2,
             'status' => '2',
-        ]);
+        ])->assignRole('mitra');
 
         // Berikan respon sukses atau redirect ke halaman lain
         return response()->json([
@@ -38,27 +38,39 @@ class UserpageController extends Controller
         ], 201);
     }
 
-    public function show () {
-        return response()->json(Toko::all());
+    public function show()
+    {
+        $data = toko::all();
+        $layanan = Layanan::all();
+
+        // Filter data toko berdasarkan user_id yang ada pada layanan
+        $filterToko = $data->filter(function ($toko) use ($layanan) {
+            return $layanan->contains('user_id', $toko->user_id);
+        });
+
+        return response()->json($filterToko);
     }
 
-    public function shiw ($uuid) {
+    public function shiw($uuid)
+    {
         $data = Toko::where('uuid', $uuid)->get();
 
         return response()->json($data);
     }
 
-    public function shaw ($userId) {
+    public function shaw($userId)
+    {
         $data = Layanan::with(['User', 'ReferensiLayanan'])->where('user_id', $userId)->get();
 
         return response()->json($data);
     }
 
-    public function ahay ($tokoUuid) {
-        $data = Promo::whereHas('Toko', function ($query) use ($tokoUuid) {
-            $query->where('uuid', $tokoUuid);
-        })->with('Toko')->get();
-        
-        return response()->json($data);
+    public function ahay($uuid)
+    {
+        $data = Toko::findByUuid($uuid);
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 }

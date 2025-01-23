@@ -18,6 +18,7 @@ return new class extends Migration
             $table->foreignId('role_id')->nullable()->references('id')->on('roles')->onDelete('cascade');
             $table->string('email')->unique();
             $table->string('phone')->unique();
+            $table->string('alamat')->nullable();
             $table->string('password');
             $table->enum('status', ['1', '2', '3'])->comment('1=gagal, 2=menunggu konfirmasi, 3=sukses');
             $table->rememberToken();
