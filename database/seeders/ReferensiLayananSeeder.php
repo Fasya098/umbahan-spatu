@@ -14,10 +14,10 @@ class ReferensiLayananSeeder extends Seeder
     public function run(): void
     {
         ReferensiLayanan::create([
-            'nama_layanan' => 'Sepatu Sporty',
+            'nama_layanan' => 'Cuci Sepatu',
         ]);
         ReferensiLayanan::create([
-            'nama_layanan' => 'Sepatu Kulit',
+            'nama_layanan' => 'Semir Sepatu',
         ]);
     }
 }

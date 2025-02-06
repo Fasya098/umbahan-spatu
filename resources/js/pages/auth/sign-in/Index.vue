@@ -4,11 +4,7 @@
         <!--begin::Heading-->
         <div class="text-center mb-10">
             <router-link to="/">
-                <img
-                    :src="setting?.logo"
-                    :alt="setting?.app"
-                    class="w-200px mb-8"
-                />
+                <img :src="setting?.logo" :alt="setting?.app" class="w-200px mb-8" />
             </router-link>
             <!--begin::Title-->
             <h1 class="mb-3">
@@ -20,12 +16,7 @@
 
         <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
             <li class="nav-item">
-                <a
-                    class="nav-link active text-primary"
-                    data-bs-toggle="tab"
-                    href="#with-email"
-                    >Email</a
-                >
+                <a class="nav-link active text-primary" data-bs-toggle="tab" href="#with-email">Email</a>
             </li>
             <!-- <li class="nav-item">
                 <a class="nav-link" data-bs-toggle="tab" href="#with-phone">{{ $t('login.telepon') }}</a>
@@ -33,11 +24,7 @@
         </ul>
 
         <div class="tab-content" id="myTabContent">
-            <div
-                class="tab-pane fade show active"
-                id="with-email"
-                role="tabpanel"
-            >
+            <div class="tab-pane fade show active" id="with-email" role="tabpanel">
                 <WithEmail />
             </div>
         </div>
@@ -123,7 +110,13 @@ export default defineComponent({
                 .post("/auth/login", { ...this.data, type: this.check.type })
                 .then((res) => {
                     this.store.setAuth(res.data.user, res.data.token);
-                    this.router.push("/dashboard");
+
+                    if (res.data.user.role_id === 3) {
+                        this.router.push("/userpage");
+                    } else {
+                        this.router.push("/dashboard");
+                    }
+
                 })
                 .catch((error) => {
                     toast.error(error.response.data.message);

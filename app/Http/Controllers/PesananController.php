@@ -31,20 +31,25 @@ class PesananController extends Controller
     public function store(Request $request)
     {
         try {
-            
-            dd($request->file('foto_sepatu'));
+            $date = Carbon::now()->toDateString();
 
-            $date = Carbon::now()->day;
+            foreach ($request->input('inputs') as $index => $input) {
+                $foto_sepatu = null;
 
-            foreach ($request->input('sepatuList') as $input) {
+                if ($request->hasFile("inputs.{$index}.foto_sepatu")) {
+                    $file = $request->file("inputs.{$index}.foto_sepatu");
+                    $foto_sepatu = str_replace('public/', '', $file->store('public/foto_sepatu'));
+                }
+
                 Pesanan::create([
-                    'toko_id' => $request->tokoId,
+                    'toko_id' => $input['toko_id'],
                     'tanggal_pesanan' => $date,
-                    'foto_sepatu' => str_replace('public/', '', $request->file('foto_sepatu')->store('public/foto_sepatu')),
+                    'foto_sepatu' => $foto_sepatu,
                     'brand_sepatu' => $input['brand_sepatu'],
                     'warna_sepatu' => $input['warna_sepatu'],
+                    'layanan_id' => $input['layanan_id'],
+                    'total_harga' => $input['total_harga'],
                     'status' => 1,
-                    'total_harga' => 20000,
                 ]);
             }
 

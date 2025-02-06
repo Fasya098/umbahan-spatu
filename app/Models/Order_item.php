@@ -6,13 +6,14 @@ use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RequestLayanan extends Model
+class Order_item extends Model
 {
     use HasFactory, Uuid;
 
-    protected $table="request_layanans";
-
-    protected $fillable=[
-        'request_nama_layanan',
+    protected $fillable = [
+        'order_id',
+        'product_name',
+        'price',
+        'quantity',
     ];
 }

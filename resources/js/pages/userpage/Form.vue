@@ -10,25 +10,34 @@ const user = ref({} as User);
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const tokoId = ref(null); // Variabel reaktif untuk menyimpan toko_id
 const tokos = ref<any>(null);
-const promos = ref<any>(null);
+const foto_sepatu = ref<any>([]);
 const route = useRoute();
 const uuid = route.params.uuid;
+const layananPrices = ref<Record<string, number>>({});
+
+console.log(route.params);
 
 // Fetch Toko Details
 const getTokoDetail = async () => {
     try {
         const response = await axios.get(`/userpage/toko/shaw/${route.params.userId}`);
         tokos.value = response.data;
+        
+        // Create a map of layanan IDs to their prices
+        tokos.value?.forEach((item: any) => {
+            layananPrices.value[item.id] = item.harga;
+        });
     } catch (error) {
-        console.error("Error fetching shoe detail:", error);
+        console.error("Error fetching toko detail:", error);
     }
 };
 
 const getTokoId = async () => {
     try {
         const response = await axios.get(`/userpage/toko/ahay/${uuid}`);
-        // console.log(response.data.data.nama_toko)
+        // console.log(response.data.data)
         tokoId.value = response.data.data.id;
+        console.log(tokoId);
     } catch (error) {
         console.error("Error mengambil tokoId", error)
     }
@@ -37,7 +46,8 @@ const getTokoId = async () => {
 const layanans = computed(() =>
     tokos.value?.map((item: any) => ({
         id: item.id,
-        text: item.referensi_layanan.nama_layanan,
+        text: `${item.referensi_layanan.nama_layanan}`,
+        price: item.harga
     }))
 );
 
@@ -49,8 +59,31 @@ function goBack(uuid) {
 
 const jumlahSepatu = ref(1);
 const sepatuList = ref([
-    { foto_sepatu: null, brand_sepatu: "", warna_sepatu: "", layanan_id: "", toko_id: tokoId },
+    {
+        foto_sepatu: "",
+        brand_sepatu: "",
+        warna_sepatu: "",
+        layanan_id: "",
+        toko_id: tokoId,
+        harga: 0,
+        total_harga: 0,
+    },
 ]);
+
+const totalHarga = computed(() => {
+    return sepatuList.value.reduce((total, sepatu) => {
+        const layananPrice = layananPrices.value[sepatu.layanan_id] || 0;
+        return total + layananPrice;
+    }, 0);
+});
+
+watch(() => sepatuList.value, (newList) => {
+    newList.forEach(sepatu => {
+        if (sepatu.layanan_id) {
+            sepatu.harga = layananPrices.value[sepatu.layanan_id] || 0;
+        }
+    });
+}, { deep: true });
 
 watch(jumlahSepatu, (newVal) => {
     if (newVal < 1) {
@@ -61,49 +94,82 @@ watch(jumlahSepatu, (newVal) => {
     const currentLength = sepatuList.value.length;
 
     if (newVal > currentLength) {
-        // Tambahkan item baru jika jumlah meningkat
         const newItems = Array.from({ length: newVal - currentLength }, () => ({
-            foto_sepatu: null,
+            foto_sepatu: "",
             brand_sepatu: "",
             warna_sepatu: "",
             layanan_id: "",
+            toko_id: tokoId,
+            harga: 0,
+            total_harga: 0,
         }));
         sepatuList.value.push(...newItems);
     } else if (newVal < currentLength) {
-        // Hapus item jika jumlah berkurang
         sepatuList.value.splice(newVal);
     }
 });
 
-// function updateFoto(event: Event, index: number) {
-//     const file = (event.target as HTMLInputElement).files?.[0] || null;
-//     sepatuList.value[index].foto_sepatu = file;
-// }
-
-function submit() {
-    block(document.getElementById("form-user"));
-
-    const requestData = {
-        ...user.value,
-        inputs: sepatuList.value
-    };
-
-    console.log("Data yang dikirim:", requestData);
-
-    axios({
-        method: "post",
-        url: "/pesanan/store",
-        data: requestData,
-    })
-        .then(() => {
-            toast.success("Data Berhasil Disimpan!");
-            router.push("/pesanan");
-        })
-        .catch((error) => {
-            console.error(error);
-            toast.error("Terjadi kesalahan saat menyimpan data!");
-        }).finally(() => unblock(document.getElementById("form-user")));
+function updateFoto(event: Event, index: number) {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files[0]) {
+        sepatuList.value[index].foto_sepatu = input.files[0];
+    }
 }
+
+async function authAndSubmit() {
+    try {
+        const authCheck = await axios.get("/auth/me");
+        if (!authCheck.data) {
+            toast.error("Anda harus login terlebih dahulu!");
+            return router.push({ name: "sign-in" });
+        }
+
+        await submit(); // Jalankan submit setelah auth check berhasil
+    } catch (error) {
+        console.error(error);
+        toast.error("Terjadi kesalahan saat melakukan autentikasi!");
+        return router.push({ name: "sign-in" }); // Add navigation here too
+    }
+}
+
+async function submit() {
+    try {
+        block(document.getElementById("form-user"));
+
+        // Create FormData to handle file uploads
+        const formData = new FormData();
+
+        // Append each sepatu's data to FormData
+        sepatuList.value.forEach((sepatu, index) => {
+            if (sepatu.foto_sepatu) {
+                formData.append(`inputs[${index}][foto_sepatu]`, sepatu.foto_sepatu);
+            }
+            formData.append(`inputs[${index}][brand_sepatu]`, sepatu.brand_sepatu);
+            formData.append(`inputs[${index}][warna_sepatu]`, sepatu.warna_sepatu);
+            formData.append(`inputs[${index}][layanan_id]`, sepatu.layanan_id);
+            formData.append(`inputs[${index}][toko_id]`, tokoId.value);
+            formData.append(`inputs[${index}][harga]`, sepatu.harga.toString());
+            formData.append(`inputs[${index}][total_harga]`, totalHarga.value.toString());
+        });
+        
+        // formData.append('total_harga', totalHarga.value.toString());
+
+        await axios.post("/pesanan/store", formData, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
+
+        toast.success("Data Berhasil Disimpan!");
+        router.push("/userpage");
+    } catch (error) {
+        console.error(error);
+        toast.error("Terjadi kesalahan saat menyimpan data!");
+    } finally {
+        unblock(document.getElementById("form-user"));
+    }
+}
+
 
 onMounted(() => {
     getTokoDetail();
@@ -152,8 +218,9 @@ onMounted(() => {
 
                     <div class="mb-3">
                         <label class="form-label">Foto Sepatu</label>
-                        <file-upload :files="sepatu.foto_sepatu" :accepted-file-types="fileTypes" required
-                            v-on:updatefiles="(file) => (sepatu.foto_sepatu = file)"></file-upload>
+                        <input type="file" class="form-control form-control-lg form-control-solid"
+                            accept="image/jpeg,image/png,image/jpg" @change="(e) => updateFoto(e, index)" />
+                        <small class="text-muted">Format yang diizinkan: JPG, JPEG, PNG</small>
                     </div>
 
                     <!-- Jenis Sepatu -->
@@ -161,6 +228,13 @@ onMounted(() => {
                         <label class="form-label">Brand Sepatu</label>
                         <input type="text" class="form-control form-control-lg form-control-solid"
                             placeholder="Masukkan brand sepatu" v-model="sepatu.brand_sepatu" />
+                    </div>
+
+                    <!-- Warna Sepatu -->
+                    <div class="mb-3">
+                        <label class="form-label">Warna Sepatu</label>
+                        <input type="text" class="form-control form-control-lg form-control-solid"
+                            placeholder="Masukkan warna sepatu" v-model="sepatu.warna_sepatu" />
                     </div>
 
                     <!-- Layanan -->
@@ -175,10 +249,10 @@ onMounted(() => {
 
             <!-- Card Footer -->
             <div class="card-footer bg-white border-0 d-flex justify-content-between align-items-center pt-3">
-                <!-- <div>
-                    <h5>Total Harga: Rp {{ totalHarga }}</h5>
-                </div> -->
-                <button @click="submit" class="btn btn-primary px-5">
+                <div>
+                    <h5>Total Harga: Rp {{ totalHarga.toLocaleString() }}</h5>
+                </div>
+                <button @click="authAndSubmit" class="btn btn-primary px-5">
                     Simpan
                 </button>
             </div>

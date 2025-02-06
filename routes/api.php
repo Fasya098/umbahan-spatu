@@ -13,6 +13,8 @@ use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ReferensiLayananController;
 use App\Http\Controllers\RequestLayananController;
 use App\Http\Controllers\UserpageController;
+use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -31,6 +33,7 @@ Route::middleware(['auth', 'json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login'])->withoutMiddleware('auth');
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
+    Route::get('check', [AuthController::class, 'check']);
 });
 
 Route::prefix('setting')->group(function () {
@@ -124,6 +127,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
 Route::prefix('userpage')->group(function () {
     Route::post('/store', [UserpageController::class, 'store']);
+    Route::post('/register', [UserpageController::class, 'register']);
     Route::get('/toko/get', [UserpageController::class, 'show']);
     Route::get('/toko/shiw/{uuid}', [UserpageController::class, 'shiw']);
     Route::get('/toko/shaw/{userId}', [UserpageController::class, 'shaw']);
@@ -133,4 +137,11 @@ Route::prefix('userpage')->group(function () {
 Route::prefix('pesanan')->group(function () {
     Route::post('', [PesananController::class, 'index']);
     Route::post('/store', [PesananController::class, 'store']);
+});
+
+Route::prefix('order')->group(function () {
+    Route::get('', [OrderController::class, 'index'])->name('customer.orders.index');
+    Route::get('/customer/{order}', [OrderController::class, 'show'])->name('customer.orders.show');
+     
+    Route::post('/midtrans-callback', [PaymentController::class, 'midtransCallback']);
 });

@@ -16,8 +16,6 @@ class AuthController extends Controller
         ]);
     }
 
-
-
     public function login(Request $request)
     {
         $validator = Validator::make($request->post(), [
@@ -50,5 +48,22 @@ class AuthController extends Controller
     {
         auth()->logout();
         return response()->json(['success' => true]);
+    }
+
+    public function check()
+    {
+        $user = auth()->user();
+
+        if (!$user) {
+            return response()->json([
+                'status' => false,
+                'message' => 'Unauthorized'
+            ], 401);
+        }
+
+        return response()->json([
+            'status' => true,
+            'user' => $user
+        ]);
     }
 }

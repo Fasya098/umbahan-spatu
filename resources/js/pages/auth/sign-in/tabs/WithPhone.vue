@@ -45,8 +45,8 @@
         <!--end::Input group-->
 
         <div v-if="/^08[0-9]\d{8,11}$/.test(data.identifier)" class="form-check mb-10">
-            <Field tabindex="3" class="form-check-input" type="checkbox" id="remember_me_hp" name="remember_me" value="1"
-                v-model="data.remember_me" />
+            <Field tabindex="3" class="form-check-input" type="checkbox" id="remember_me_hp" name="remember_me"
+                value="1" v-model="data.remember_me" />
             <label class="form-check-label" for="remember_me_hp">
                 {{ $t('login.remember') }}
             </label>
@@ -117,7 +117,13 @@ export default defineComponent({
 
             axios.post("/auth/login", { ...this.data, type: "phone" }).then(res => {
                 this.store.setAuth(res.data.user, res.data.token);
-                this.router.push("/dashboard");
+
+                if (res.data.user.role_id === 3) {
+                    this.router.push("/userpage");
+                } else {
+                    this.router.push("/dashboard");
+                }
+
             }).catch(error => {
                 console.log(error)
                 toast.error(error.response.data.message);

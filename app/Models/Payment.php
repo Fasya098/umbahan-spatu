@@ -6,13 +6,15 @@ use App\Traits\Uuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class RequestLayanan extends Model
+class Payment extends Model
 {
     use HasFactory, Uuid;
 
-    protected $table="request_layanans";
-
-    protected $fillable=[
-        'request_nama_layanan',
+    public $fillable = [
+        'order_id',
+        'snap_token',
+        'status',
+        'expired_at',
+        'paid_at',
     ];
 }

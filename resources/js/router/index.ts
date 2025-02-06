@@ -22,6 +22,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
             middleware: "auth",
+            allowedRoles: [1, 2],
         },
         children: [
             {
@@ -97,7 +98,9 @@ const routes: Array<RouteRecordRaw> = [
                 path: "/dashboard/master/referensi/layanan",
                 name: "dashboard.master.referensi.layanan",
                 component: () =>
-                    import("@/pages/dashboard/master/referensi/layanan/Index.vue"),
+                    import(
+                        "@/pages/dashboard/master/referensi/layanan/Index.vue"
+                    ),
                 meta: {
                     pageTitle: "Referensi Layanan",
                     breadcrumbs: ["Master", "Referensi Layanan"],
@@ -107,7 +110,9 @@ const routes: Array<RouteRecordRaw> = [
                 path: "/dashboard/master/request/layanan",
                 name: "dashboard.master.request.layanan",
                 component: () =>
-                    import("@/pages/dashboard/master/request/layanan/Index.vue"),
+                    import(
+                        "@/pages/dashboard/master/request/layanan/Index.vue"
+                    ),
                 meta: {
                     pageTitle: "Request Layanan",
                     breadcrumbs: ["Master", "Request Layanan"],
@@ -156,6 +161,16 @@ const routes: Array<RouteRecordRaw> = [
         ],
     },
     {
+        path: "/register",
+        name: "/register",
+        component: () => import("@/pages/userpage/register/Index.vue"),
+    },
+    {
+        path: "/login",
+        name: "/login",
+        component: () => import("@/pages/auth/sign-in/user/Login.vue"),
+    },
+    {
         path: "/userpage",
         name: "/userpage",
         component: () => import("@/pages/userpage/Index.vue"),
@@ -179,6 +194,21 @@ const routes: Array<RouteRecordRaw> = [
         path: "/userpage/form/:uuid/:userId",
         name: "userpage.form",
         component: () => import("@/pages/userpage/Form.vue"),
+    },
+    {
+        path: "/",
+        component: () => import("@/layouts/AuthLayout.vue"),
+        children: [
+            {
+                path: "/sign-in",
+                name: "sign-in",
+                component: () => import("@/pages/auth/sign-in/Index.vue"),
+                meta: {
+                    pageTitle: "Sign In",
+                    middleware: "guest",
+                },
+            },
+        ],
     },
     {
         path: "/",

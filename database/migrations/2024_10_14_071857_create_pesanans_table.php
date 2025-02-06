@@ -14,14 +14,15 @@ return new class extends Migration
         Schema::create('pesanans', function (Blueprint $table) {
             $table->id();
             $table->uuid()->unique();
-            $table->foreignId('toko_id')->references('id')->on('tokos')->onDelete('cascade');
-            $table->foreignId('layanan_id')->references('id')->on('layanans')->onDelete('cascade');
-            $table->foreignId('promo_id')->nullable()->references('id')->on('promos')->onDelete('cascade');
-            $table->string('foto_sepatu');
-            $table->string('brand_sepatu');
-            $table->date('tanggal_pesanan');
-            $table->enum('status', ['1', '2', '3'])->comment('1=Penjemputan, 2=Pengerjaan, 3=pengiriman');
-            $table->double('total_harga');
+            $table->foreignId('user_id')->nullable()->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('toko_id')->nullable()->references('id')->on('tokos')->onDelete('cascade');
+            $table->foreignId('layanan_id')->nullable()->references('id')->on('layanans')->onDelete('cascade');
+            $table->string('foto_sepatu')->nullable();
+            $table->string('brand_sepatu')->nullable();
+            $table->string('warna_sepatu')->nullable();
+            $table->date('tanggal_pesanan')->nullable();
+            $table->enum('status', ['1', '2', '3'])->nullable()->comment('1=Penjemputan, 2=Pengerjaan, 3=pengiriman');
+            $table->double('total_harga')->nullable();
             $table->timestamps();
         });
     }

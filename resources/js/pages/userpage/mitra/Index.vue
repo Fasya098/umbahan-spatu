@@ -23,6 +23,12 @@
               </div>
 
               <div class="mb-3">
+                <label for="alamat" class="form-label">Alamat</label>
+                <input type="text" class="form-control" id="alamat" v-model="form.alamat"
+                  placeholder="Masukkan Alamat Lengkap" required />
+              </div>
+
+              <div class="mb-3">
                 <label for="email" class="form-label">Email</label>
                 <input type="email" class="form-control" id="email" v-model="form.email" placeholder="Masukkan email"
                   required />

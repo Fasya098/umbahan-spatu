@@ -13,9 +13,9 @@ class Pesanan extends Model
     protected $table = "pesanans";
 
     protected $fillable = [
+        'user_id',
         'toko_id',
         'layanan_id',
-        'promo_id',
         'foto_sepatu',
         'brand_sepatu',
         'warna_sepatu',

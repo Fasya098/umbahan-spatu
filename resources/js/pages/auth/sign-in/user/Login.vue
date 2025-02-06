@@ -8,7 +8,7 @@
 
             <!--begin::Input-->
             <Field tabindex="1" class="form-control form-control-lg form-control-solid" type="text" name="email"
-                autocomplete="off" v-model="data.email" style="margin-bottom: 10px;" />
+                autocomplete="off" v-model="data.email"  style="margin-bottom: 10px;"/>
             <!--end::Input-->
             <div class="fv-plugins-message-container">
                 <div class="fv-help-block">
@@ -28,7 +28,7 @@
 
                 <!--begin::Link-->
                 <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
-                    Lupa Password ?
+                    Forgot Password ?
                 </router-link>
                 <!--end::Link-->
             </div>
@@ -74,12 +74,6 @@
                     <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
                 </span>
             </button>
-
-            <div v-if="showRegisterLink">
-                <router-link to="/register" class="link-primary fs-6 fw-bold" style="color: white !important;">
-                    Belum punya akun? Register
-                </router-link>
-            </div>
             <!--end::Submit button-->
         </div>
         <!--end::Actions-->
@@ -88,7 +82,7 @@
 
 <script lang="ts">
 import { getAssetPath } from "@/core/helpers/assets";
-import { defineComponent, ref, computed } from "vue";
+import { defineComponent, ref } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import { useRouter } from "vue-router";
 import * as Yup from "yup";
@@ -101,9 +95,6 @@ export default defineComponent({
         const store = useAuthStore();
         const router = useRouter();
 
-        const showRegisterLink = computed(() => {
-            return router.options.history.state.back?.startsWith("/userpage/store/");
-        });
         const submitButton = ref(null);
 
         //Create form validation object
@@ -116,9 +107,7 @@ export default defineComponent({
             login,
             submitButton,
             getAssetPath,
-            store,
-            router,
-            showRegisterLink,
+            store, router
         };
     },
     data() {
@@ -135,13 +124,7 @@ export default defineComponent({
 
             axios.post("/auth/login", { ...this.data, type: "email" }).then(res => {
                 this.store.setAuth(res.data.user, res.data.token);
-
-                if (res.data.user.role_id === 3) {
-                    this.router.push("/userpage");
-                } else {
-                    this.router.push("/dashboard");
-                }
-
+                this.router.push("/userpage");
             }).catch(error => {
                 toast.error(error.response.data.message);
             }).finally(() => {

@@ -26,5 +26,6 @@ class Layanan extends Model
     public function ReferensiLayanan ()
     {
         return $this->belongsTo(ReferensiLayanan::class);
-    }     
+    } 
+    
 }
