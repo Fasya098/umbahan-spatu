@@ -100,4 +100,12 @@ class UserpageController extends Controller
             'user' => $user,
         ], 201);
     }
+
+    public function me()
+    {
+        $user = User::with(['toko'])->where('id', auth()->user()->id)->first();
+        return response()->json([
+            'user' => $user
+        ]);
+    }
 }

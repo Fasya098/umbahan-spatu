@@ -128,6 +128,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 Route::prefix('userpage')->group(function () {
     Route::post('/store', [UserpageController::class, 'store']);
     Route::post('/register', [UserpageController::class, 'register']);
+    Route::get('/me', [UserpageController::class, 'me']);
     Route::get('/toko/get', [UserpageController::class, 'show']);
     Route::get('/toko/shiw/{uuid}', [UserpageController::class, 'shiw']);
     Route::get('/toko/shaw/{userId}', [UserpageController::class, 'shaw']);

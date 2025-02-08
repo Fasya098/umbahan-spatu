@@ -29,4 +29,9 @@ class Toko extends Model
     public function Promo () {
         return $this->hasMany(Promo::class);
     }
+
+    public function pesanan ()
+    {
+        return $this->hasMany(Pesanan::class);
+    }
 }

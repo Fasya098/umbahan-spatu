@@ -23,5 +23,24 @@ class Pesanan extends Model
         'status',
         'total_harga',
     ];
-    
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function toko()
+    {
+        return $this->belongsTo(Toko::class);
+    }
+
+    public function layanan()
+    {
+        return $this->belongsTo(Layanan::class);
+    }
+
+    public function referensiLayanan()
+    {
+        return $this->belongsTo(ReferensiLayanan::class);
+    }
 }

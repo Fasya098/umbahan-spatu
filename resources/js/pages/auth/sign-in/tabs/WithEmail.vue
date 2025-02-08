@@ -130,38 +130,57 @@ export default defineComponent({
         }
     },
     methods: {
-        submit() {
-            blockBtn(this.submitButton);
-
-            axios.post("/auth/login", { ...this.data, type: "email" }).then(res => {
-                this.store.setAuth(res.data.user, res.data.token);
-
-                if (res.data.user.role_id === 3) {
-                    this.router.push("/userpage");
+    async submit() {
+        blockBtn(this.submitButton);
+        
+        try {
+            const res = await axios.post("/auth/login", { ...this.data, type: "email" });
+            
+            // Set auth data
+            this.store.setAuth(res.data.user, res.data.token);
+            
+            // Set authentication state
+            localStorage.setItem('isAuthenticated', 'true');
+            
+            // Handle navigation after login
+            const intendedRoute = localStorage.getItem('intended_route');
+            if (intendedRoute) {
+                const route = JSON.parse(intendedRoute);
+                localStorage.removeItem('intended_route');
+                
+                // Validate route data before navigation
+                if (route.name && route.params) {
+                    this.router.push(route);
                 } else {
-                    this.router.push("/dashboard");
+                    this.handleDefaultNavigation(res.data.user.role_id);
                 }
-
-            }).catch(error => {
-                toast.error(error.response.data.message);
-            }).finally(() => {
-                unblockBtn(this.submitButton);
-            });
-        },
-        togglePassword(ev) {
-            const type = document.querySelector("[name=password]").type;
-
-            if (type === 'password') {
-                document.querySelector("[name=password]").type = 'text';
-                ev.target.classList.add("bi-eye");
-                ev.target.classList.remove("bi-eye-slash");
             } else {
-                document.querySelector("[name=password]").type = 'password';
-                ev.target.classList.remove("bi-eye");
-                ev.target.classList.add("bi-eye-slash");
+                this.handleDefaultNavigation(res.data.user.role_id);
             }
-
+            
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            unblockBtn(this.submitButton);
         }
+    },
+
+    handleDefaultNavigation(roleId) {
+        if (roleId === 3) {
+            this.router.push("/userpage");
+        } else {
+            this.router.push("/dashboard");
+        }
+    },
+
+    togglePassword(ev) {
+        const passwordInput = document.querySelector("[name=password]");
+        const isPassword = passwordInput.type === 'password';
+        
+        passwordInput.type = isPassword ? 'text' : 'password';
+        ev.target.classList.toggle("bi-eye", isPassword);
+        ev.target.classList.toggle("bi-eye-slash", !isPassword);
     }
+}
 })
 </script>

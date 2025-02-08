@@ -22,7 +22,6 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
             middleware: "auth",
-            allowedRoles: [1, 2],
         },
         children: [
             {
@@ -172,7 +171,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/userpage",
-        name: "/userpage",
+        name: "userpage",
         component: () => import("@/pages/userpage/Index.vue"),
     },
     {
@@ -284,6 +283,21 @@ const router = createRouter({
     },
 });
 
+router.beforeEach((to, from, next) => {
+    if (to.name === 'userpage.form') {
+        // Check if user is authenticated
+        const isAuthenticated = localStorage.getItem('isAuthenticated') === 'true';
+        
+        if (!isAuthenticated) {
+            next('/sign-in');
+        } else {
+            next();
+        }
+    } else {
+        next();
+    }
+});
+
 router.beforeEach(async (to, from, next) => {
     if (to.name) {
         // Start the route progress bar.
@@ -325,7 +339,11 @@ router.beforeEach(async (to, from, next) => {
             next({ name: "sign-in" });
         }
     } else if (to.meta.middleware == "guest" && authStore.isAuthenticated) {
-        next({ name: "dashboard" });
+        if (authStore.user.role_id === 3) {
+            next({ name: "userpage" });
+        } else {
+            next({ name: "dashboard" }); // Assuming there's a separate dashboard for other roles
+        }
     } else {
         next();
     }

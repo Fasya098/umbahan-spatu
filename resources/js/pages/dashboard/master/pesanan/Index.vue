@@ -18,14 +18,33 @@ const columns = [
     column.accessor("no", {
         header: "#",
     }),
-    column.accessor("name", {
-        header: "Nama",
+    column.accessor("user.name", {
+        header: "Customer",
     }),
-    column.accessor("email", {
-        header: "Email",
+    column.accessor("toko.nama_toko", {
+        header: "Toko",
     }),
-    column.accessor("phone", {
-        header: "No. Telp",
+    column.accessor("layanan.referensi_layanan.nama_layanan", {
+        header: "Layanan",
+    }),
+    column.accessor("brand_sepatu", {
+        header: "Brand sepatu",
+    }),
+    column.accessor("warna_sepatu", {
+        header: "Warna sepatu",
+    }),
+    column.accessor("tanggal_pesanan", {
+        header: "Tanggal memesan",
+    }),
+    column.accessor("status", {
+        header: "Status",
+    }),
+    column.accessor("total_harga", {
+        header: "Total harga",
+    }),
+    column.accessor("foto_sepatu", {
+        header: "Foto sepatu",
+        cell: cell => h ('img', {src: `/storage/${cell.getValue()}`,width : 100})
     }),
     column.accessor("uuid", {
         header: "Aksi",

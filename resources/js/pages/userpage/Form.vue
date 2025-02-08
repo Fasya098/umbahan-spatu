@@ -9,6 +9,7 @@ import { block, unblock } from "@/libs/utils";
 const user = ref({} as User);
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const tokoId = ref(null); // Variabel reaktif untuk menyimpan toko_id
+const customerId = ref(null); // Variabel reaktif untuk menyimpan toko_id
 const tokos = ref<any>(null);
 const foto_sepatu = ref<any>([]);
 const route = useRoute();
@@ -29,6 +30,16 @@ const getTokoDetail = async () => {
         });
     } catch (error) {
         console.error("Error fetching toko detail:", error);
+    }
+};
+
+const getCustomerId = async () => {
+    try {
+        const response = await axios.get(`/userpage/me`);
+        customerId.value = response.data.user.id;
+        console.log("customer_id", customerId);
+    } catch (error) {
+        console.error("error mengambil data", error);
     }
 };
 
@@ -65,6 +76,7 @@ const sepatuList = ref([
         warna_sepatu: "",
         layanan_id: "",
         toko_id: tokoId,
+        user_id: customerId,
         harga: 0,
         total_harga: 0,
     },
@@ -100,6 +112,7 @@ watch(jumlahSepatu, (newVal) => {
             warna_sepatu: "",
             layanan_id: "",
             toko_id: tokoId,
+            user_id: customerId,
             harga: 0,
             total_harga: 0,
         }));
@@ -113,22 +126,6 @@ function updateFoto(event: Event, index: number) {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files[0]) {
         sepatuList.value[index].foto_sepatu = input.files[0];
-    }
-}
-
-async function authAndSubmit() {
-    try {
-        const authCheck = await axios.get("/auth/me");
-        if (!authCheck.data) {
-            toast.error("Anda harus login terlebih dahulu!");
-            return router.push({ name: "sign-in" });
-        }
-
-        await submit(); // Jalankan submit setelah auth check berhasil
-    } catch (error) {
-        console.error(error);
-        toast.error("Terjadi kesalahan saat melakukan autentikasi!");
-        return router.push({ name: "sign-in" }); // Add navigation here too
     }
 }
 
@@ -148,6 +145,7 @@ async function submit() {
             formData.append(`inputs[${index}][warna_sepatu]`, sepatu.warna_sepatu);
             formData.append(`inputs[${index}][layanan_id]`, sepatu.layanan_id);
             formData.append(`inputs[${index}][toko_id]`, tokoId.value);
+            formData.append(`inputs[${index}][user_id]`, customerId.value);
             formData.append(`inputs[${index}][harga]`, sepatu.harga.toString());
             formData.append(`inputs[${index}][total_harga]`, totalHarga.value.toString());
         });
@@ -174,6 +172,7 @@ async function submit() {
 onMounted(() => {
     getTokoDetail();
     getTokoId();
+    getCustomerId();
 });
 </script>
 
@@ -252,7 +251,7 @@ onMounted(() => {
                 <div>
                     <h5>Total Harga: Rp {{ totalHarga.toLocaleString() }}</h5>
                 </div>
-                <button @click="authAndSubmit" class="btn btn-primary px-5">
+                <button @click="submit" class="btn btn-primary px-5">
                     Simpan
                 </button>
             </div>

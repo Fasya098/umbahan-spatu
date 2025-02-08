@@ -2,15 +2,45 @@
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter, useRoute } from 'vue-router';
+import { toast } from 'vue3-toastify';
 
 const tokos = ref([]);
 const router = useRouter();
 const route = useRoute();
 const uuid = route.params.uuid;
 
-function goToForm(uuid, userId) {
-    router.push({ name: 'userpage.form', params: { uuid, userId } });
-};
+async function checkAuthAndNavigate(tokoUuid: string, userId: string) {
+    let customerId: string | null = null;
+
+    try {
+        // Check authentication status
+        const response = await axios.get('/userpage/me');
+        const customerId = response.data?.id ?? null;
+        // If successful (no error thrown), user is authenticated
+        router.push({
+            name: 'userpage.form',
+            params: {
+                uuid: tokoUuid,
+                userId: userId,
+                id: customerId,
+            }
+        });
+    } catch (error) {
+        // If error, user is not authenticated
+        // Store the intended destination for after login
+        localStorage.setItem('intended_route', JSON.stringify({
+            name: 'userpage.form',
+            params: {
+                uuid: tokoUuid,
+                userId: userId,
+                id: customerId,
+            }
+        }));
+
+        // Redirect to login page
+        router.push('/sign-in');
+    }
+}
 
 function goBack() {
     router.push('/userpage');
@@ -76,11 +106,13 @@ onMounted(() => {
                                         <div class="d-flex flex-column gap-2">
                                             <div class="d-flex align-items-center">
                                                 <i class="bi bi-telephone-fill me-2 text-primary"></i>
-                                                <span class="fw-medium" style="font-size: 1rem;">{{ toko.nomor_telepon }}</span>
+                                                <span class="fw-medium" style="font-size: 1rem;">{{ toko.nomor_telepon
+                                                    }}</span>
                                             </div>
                                             <div class="d-flex align-items-start">
                                                 <i class="bi bi-geo-alt-fill me-2 mt-2 text-primary"></i>
-                                                <span class="fw-medium" style="font-size: 1rem;">{{ toko.alamat }}</span>
+                                                <span class="fw-medium" style="font-size: 1rem;">{{ toko.alamat
+                                                    }}</span>
                                             </div>
                                         </div>
                                     </div>
@@ -96,7 +128,7 @@ onMounted(() => {
                             Kembali
                         </button>
                         <button class="btn btn-primary px-3 py-2 rounded-3 shadow-sm"
-                            @click="goToForm(toko.uuid, toko.user_id)">
+                            @click="checkAuthAndNavigate(toko.uuid, toko.user_id)">
                             <i class="bi bi-cart-plus me-2"></i>
                             Pesan Disini
                         </button>
@@ -106,40 +138,38 @@ onMounted(() => {
         </div>
     </div>
     <footer class="footer">
-      <div class="footer-content">
-        <div class="company-info">
-          <img src="/media/logo-spatu-nobackground.png" alt="Logo Perusahaan" class="company-logo">
-          <h2 class="text-white">Cuci Sepatu Bersih</h2>
-          <p>Jl. Contoh No. 123, Kota Anda</p>
-          <p>Telp: (021) 1234-5678</p>
-          <p>Email: info@cucisepatubersih.com</p>
+        <div class="footer-content">
+            <div class="company-info">
+                <img src="/media/logo-spatu-nobackground.png" alt="Logo Perusahaan" class="company-logo">
+                <h2 class="text-white">Cuci Sepatu Bersih</h2>
+                <p>Jl. Contoh No. 123, Kota Anda</p>
+                <p>Telp: (021) 1234-5678</p>
+                <p>Email: info@cucisepatubersih.com</p>
+            </div>
         </div>
-      </div>
     </footer>
-
 </template>
 
 <style scoped>
-
 .footer {
-  background-color: #333;
-  color: white;
-  padding: 2rem;
+    background-color: #333;
+    color: white;
+    padding: 2rem;
 }
 
 .footer-content {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 }
 
 .company-info {
-  text-align: center;
+    text-align: center;
 }
 
 .company-logo {
-  width: 100px;
-  height: auto;
-  margin-bottom: 1rem;
+    width: 100px;
+    height: auto;
+    margin-bottom: 1rem;
 }
 
 .shoe-image {

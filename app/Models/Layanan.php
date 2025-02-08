@@ -28,4 +28,8 @@ class Layanan extends Model
         return $this->belongsTo(ReferensiLayanan::class);
     } 
     
+    public function pesanan () 
+    {
+        return $this->hasMany(Pesanan::class);
+    }
 }

@@ -20,4 +20,9 @@ class ReferensiLayanan extends Model
     {
         return $this->hasMany(Layanan::class);
     }
+
+    public function pesanan()
+    {
+        return $this->hasMany(Pesanan::class);
+    }
 }
