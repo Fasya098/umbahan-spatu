@@ -5,7 +5,9 @@ import { useRouter, useRoute } from "vue-router";
 import axios from "axios";
 import type { User, Role } from "@/types";
 import { block, unblock } from "@/libs/utils";
+import { useAuthStore } from "@/stores/auth";
 
+const auth = useAuthStore();
 const user = ref({} as User);
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const tokoId = ref(null); // Variabel reaktif untuk menyimpan toko_id
@@ -17,7 +19,7 @@ const uuid = route.params.uuid;
 const layananPrices = ref<Record<string, number>>({});
 
 console.log(route.params);
-
+console.log("auth: ", useAuthStore());
 // Fetch Toko Details
 const getTokoDetail = async () => {
     try {
@@ -33,22 +35,12 @@ const getTokoDetail = async () => {
     }
 };
 
-const getCustomerId = async () => {
-    try {
-        const response = await axios.get(`/userpage/me`);
-        customerId.value = response.data.user.id;
-        console.log("customer_id", customerId);
-    } catch (error) {
-        console.error("error mengambil data", error);
-    }
-};
-
 const getTokoId = async () => {
     try {
         const response = await axios.get(`/userpage/toko/ahay/${uuid}`);
         // console.log(response.data.data)
         tokoId.value = response.data.data.id;
-        console.log(tokoId);
+        // console.log(tokoId);
     } catch (error) {
         console.error("Error mengambil tokoId", error)
     }
@@ -172,7 +164,8 @@ async function submit() {
 onMounted(() => {
     getTokoDetail();
     getTokoId();
-    getCustomerId();
+
+    customerId.value = auth.user.id;
 });
 </script>
 

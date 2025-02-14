@@ -3,15 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Toko;
-use App\Http\Requests\StoreUserRequest;
-use App\Http\Requests\UpdateUserRequest;
-use App\Models\Layanan;
-use App\Models\Role;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+
 class TokoController extends Controller
 {
     public function index(Request $request)
@@ -32,7 +28,8 @@ class TokoController extends Controller
         return response()->json($data);
     }
 
-    public function add(Request $request) {
+    public function add(Request $request)
+    {
         $request->validate([
             'nama_toko' => 'required',
             'deskripsi' => 'required',
@@ -42,16 +39,16 @@ class TokoController extends Controller
             'user_id' => 'required',
             'ongkir' => 'required',
         ]);
-    
+
         // Mengambil data dari request
         $data = $request->all();
-    
+
         // Menyimpan foto dan mengubah path sesuai kebutuhan
         $data['foto_toko'] = str_replace('public/', '', $request->file('foto_toko')->store('public/toko'));
-    
+
         // Cek apakah data Toko sudah ada
         $toko = Toko::first(); // Anda bisa mengganti dengan kondisi lain jika ingin
-    
+
         if ($toko) {
             // Jika toko sudah ada, update data toko
             $toko->update($data);
@@ -59,25 +56,28 @@ class TokoController extends Controller
             // Jika toko belum ada, buat data toko baru
             $toko = Toko::create($data);
         }
-    
+
         return response()->json([
             'status' => true,
             'message' => 'telah disimpan',
             'data' => $toko
         ]);
     }
-    
-    public function show () {
+
+    public function show()
+    {
         return response()->json(Toko::all());
     }
 
-    public function shiw ($tokoUuid) {
+    public function shiw($tokoUuid)
+    {
         $data = Toko::where('uuid', $tokoUuid)->get();
 
         return response()->json($data);
     }
 
-    public function shaw () {
+    public function shaw()
+    {
         $data = Toko::with('user')->get();
 
         return response()->json($data);
@@ -128,5 +128,22 @@ class TokoController extends Controller
                 'message' => 'gagal mengubah'
             ]);
         }
+    }
+
+    public function get($id)
+    {
+        $data = Toko::where('user_id', $id)->first();
+
+        if (!$data) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Toko tidak ditemukan',
+            ], 404);
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+        ]);
     }
 }

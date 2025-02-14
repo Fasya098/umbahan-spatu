@@ -59,7 +59,7 @@ const columns = [
                             openForm.value = true;
                         },
                     },
-                    h("i", { class: "la la-pencil fs-2" })
+                    "Lihat foto"
                 ),
                 h(
                     "button",

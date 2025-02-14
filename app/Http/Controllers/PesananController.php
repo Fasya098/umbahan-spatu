@@ -19,12 +19,11 @@ class PesananController extends Controller
         $page = $request->page ? $request->page - 1 : 0;
 
         DB::statement('set @no=0+' . $page * $per);
-        $data = Pesanan::with(['user', 'toko', 'layanan.ReferensiLayanan'])->
-        when($request->search, function (Builder $query, string $search) {
-            $query->where('name', 'like', "%$search%")
-                ->orWhere('email', 'like', "%$search%")
-                ->orWhere('phone', 'like', "%$search%");
-        })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+        $data = Pesanan::with(['user', 'toko', 'layanan.ReferensiLayanan'])->when($request->search, function (Builder $query, string $search) {
+                $query->where('name', 'like', "%$search%")
+                    ->orWhere('email', 'like', "%$search%")
+                    ->orWhere('phone', 'like', "%$search%");
+            })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
     }
@@ -69,4 +68,54 @@ class PesananController extends Controller
         }
     }
 
+    public function edit($uuid)
+    {
+        $pesanan = Pesanan::findByUuid($uuid);
+        return response()->json([
+            'success' => true,
+            'data' => $pesanan
+        ]);
+    }
+
+    public function get($id)
+    {
+        $data = Pesanan::with('user')->where('toko_id', $id)->get();
+        $totalPesanan = $data->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'total_pesanan' => $totalPesanan,
+        ]);
+    }
+
+    public function proses($id)
+    {
+        $data = Pesanan::where('toko_id', $id)
+            ->where('status', 2)
+            ->get();
+
+        $totalPesanan = $data->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'total_pesanan' => $totalPesanan,
+        ]);
+    }
+
+    public function selesai($id)
+    {
+        $data = Pesanan::where('toko_id', $id)
+            ->where('status', 3)
+            ->get();
+
+        $totalPesanan = $data->count();
+
+        return response()->json([
+            'success' => true,
+            'data' => $data,
+            'total_pesanan' => $totalPesanan,
+        ]);
+    }
 }

@@ -20,6 +20,9 @@ return new class extends Migration
             $table->string('phone')->unique();
             $table->string('alamat')->nullable();
             $table->string('password');
+            $table->string('otp_code')->nullable();
+            $table->timestamp('otp_expired')->nullable();
+            $table->boolean('is_verified')->default(false);
             $table->enum('status', ['1', '2', '3'])->comment('1=gagal, 2=menunggu konfirmasi, 3=sukses');
             $table->rememberToken();
             $table->timestamps();

@@ -3,20 +3,19 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRouter, useRoute } from 'vue-router';
 import { toast } from 'vue3-toastify';
+import { useAuthStore } from "@/stores/auth";
 
+const auth = useAuthStore();
 const tokos = ref([]);
 const router = useRouter();
 const route = useRoute();
 const uuid = route.params.uuid;
 
 async function checkAuthAndNavigate(tokoUuid: string, userId: string) {
-    let customerId: string | null = null;
+    const customerId = auth.user?.id ?? null;
 
-    try {
-        // Check authentication status
-        const response = await axios.get('/userpage/me');
-        const customerId = response.data?.id ?? null;
-        // If successful (no error thrown), user is authenticated
+    if (customerId) {
+        // Jika user sudah login, langsung navigasi ke halaman tujuan
         router.push({
             name: 'userpage.form',
             params: {
@@ -25,9 +24,8 @@ async function checkAuthAndNavigate(tokoUuid: string, userId: string) {
                 id: customerId,
             }
         });
-    } catch (error) {
-        // If error, user is not authenticated
-        // Store the intended destination for after login
+    } else {
+        // Jika belum login, simpan rute tujuan ke localStorage dan arahkan ke login
         localStorage.setItem('intended_route', JSON.stringify({
             name: 'userpage.form',
             params: {
@@ -37,10 +35,10 @@ async function checkAuthAndNavigate(tokoUuid: string, userId: string) {
             }
         }));
 
-        // Redirect to login page
         router.push('/sign-in');
     }
 }
+
 
 function goBack() {
     router.push('/userpage');

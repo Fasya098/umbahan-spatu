@@ -42,7 +42,7 @@
                 <!--end::Input-->
 
                 <!--begin::Visibility toggle-->
-                <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 me-n2">
+                <span class="btn btn-sm btn-icon position-absolute translate-middle top-50 end-0 ms-1">
                     <i class="bi bi-eye-slash fs-2" @click="togglePassword"></i>
                 </span>
                 <!--end::Visibility toggle-->

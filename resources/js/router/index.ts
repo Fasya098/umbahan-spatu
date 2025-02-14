@@ -175,6 +175,11 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/userpage/Index.vue"),
     },
     {
+        path: "/userpage/otp",
+        name: "userpage.otp",
+        component: () => import("@/pages/userpage/KodeOtp.vue"),
+    },
+    {
         path: "/userpage/store/:uuid",
         name: "userpage.store",
         component: () => import("@/pages/userpage/Store.vue"),

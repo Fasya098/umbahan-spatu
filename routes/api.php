@@ -70,6 +70,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::middleware('can:master-pesanan')->group(function () {
             Route::post('pesanan', [PesananController::class, 'index']);
             Route::post('pesanan/store', [PesananController::class, 'store']);
+            Route::get('pesanan/edit/{uuid}', [PesananController::class, 'edit']);
         });
 
         Route::middleware('can:master-toko')->group(function () {
@@ -127,22 +128,30 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
 Route::prefix('userpage')->group(function () {
     Route::post('/store', [UserpageController::class, 'store']);
-    Route::post('/register', [UserpageController::class, 'register']);
     Route::get('/me', [UserpageController::class, 'me']);
     Route::get('/toko/get', [UserpageController::class, 'show']);
     Route::get('/toko/shiw/{uuid}', [UserpageController::class, 'shiw']);
     Route::get('/toko/shaw/{userId}', [UserpageController::class, 'shaw']);
     Route::get('/toko/ahay/{uuid}', [UserpageController::class, 'ahay']);
+    Route::post('/register', [UserpageController::class, 'register']);
+    Route::post('/checkOtp', [UserpageController::class, 'checkOtp']);
+    Route::post('/resendOtp', [UserpageController::class, 'resendOtp']);
 });
 
 Route::prefix('pesanan')->group(function () {
     Route::post('', [PesananController::class, 'index']);
     Route::post('/store', [PesananController::class, 'store']);
+    Route::get('/get/{id}', [PesananController::class, 'get']);
+    Route::get('/proses/{id}', [PesananController::class, 'proses']);
+    Route::get('/selesai/{id}', [PesananController::class, 'selesai']);
 });
 
 Route::prefix('order')->group(function () {
     Route::get('', [OrderController::class, 'index'])->name('customer.orders.index');
     Route::get('/customer/{order}', [OrderController::class, 'show'])->name('customer.orders.show');
-     
     Route::post('/midtrans-callback', [PaymentController::class, 'midtransCallback']);
+});
+
+Route::prefix('dashboard')->group(function () {
+    Route::get('/get/{id}', [TokoController::class, 'get']);
 });

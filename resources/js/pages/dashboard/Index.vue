@@ -1,123 +1,363 @@
-<template>
-  <div class="container my-4">
-    <header class="d-flex justify-content-between align-items-center mb-4">
-      <h1 class="h3">Dashboard Admin - Laundry Sepatu</h1>
-      <!-- <button @click="logout" class="btn btn-danger">Logout</button> -->
-    </header>
+<script setup lang="ts">
+import { useRouter } from "vue-router"
+import { ref, onMounted } from "vue"
+import axios from "@/libs/axios";
 
-    <section class="row mb-4">
-      <div class="col-md-4">
-        <div class="card text-center bg-primary text-white">
-          <div class="card-body">
-            <h5 class="card-title">Total Pesanan</h5>
-            <p class="card-text display-4">{{ totalOrders }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-center bg-warning text-dark">
-          <div class="card-body">
-            <h5 class="card-title">Pesanan Diproses</h5>
-            <p class="card-text display-4">{{ processingOrders }}</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="card text-center bg-success text-white">
-          <div class="card-body">
-            <h5 class="card-title">Pesanan Selesai</h5>
-            <p class="card-text display-4">{{ completedOrders }}</p>
-          </div>
-        </div>
-      </div>
-    </section>
+const hotel = ref([])
+const router = useRouter()
+const local = localStorage.getItem('napbar')
 
-    <section>
-      <h2 class="h4 mb-3">Daftar Pesanan</h2>
-      <table class="table table-striped">
-        <thead class="thead-light">
-          <tr>
-            <th>#</th>
-            <th>Nama Customer</th>
-            <th>Jumlah Sepatu</th>
-            <th>Status</th>
-            <th>Aksi</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="(order, index) in orders" :key="order.id">
-            <td>{{ index + 1 }}</td>
-            <td>{{ order.customerName }}</td>
-            <td>{{ order.shoeCount }}</td>
-            <td>{{ order.status }}</td>
-            <td>
-              <button @click="updateOrderStatus(order.id, 'diproses')" class="btn btn-primary btn-sm">Proses</button>
-              <button @click="updateOrderStatus(order.id, 'selesai')" class="btn btn-success btn-sm">Selesaikan</button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </section>
-  </div>
-</template>
+const carouselOptions = {
+  autoplay: true,
+  interval: 3000,
+  arrows: false,
+  gap: 5,
+  type: 'loop',
+  height: '21rem',
+  perPage: 2,
+  perMove: 1,
+  pagination: false,
+  focus  : 'center',
+}
 
-<script setup>
-import { ref, onMounted } from 'vue';
-
-// State untuk data
-const totalOrders = ref(0);
-const processingOrders = ref(0);
-const completedOrders = ref(0);
-const orders = ref([]);
-
-// Fungsi fetch data dari backend
-const fetchDashboardData = async () => {
-  try {
-    // Simulasi fetch data
-    const response = await fetch('/api/admin/dashboard'); // Ganti dengan endpoint Anda
-    const data = await response.json();
-    totalOrders.value = data.totalOrders;
-    processingOrders.value = data.processingOrders;
-    completedOrders.value = data.completedOrders;
-    orders.value = data.orders;
-  } catch (error) {
-    console.error('Error fetching dashboard data:', error);
+const butt = () => {
+  const redirect = localStorage.getItem('napbar');
+  if (redirect) {
+    // Menghapus bagian "/admin" dari URL
+    const cleanedURL = redirect.replace('/admin', '');
+    // Menghapus bagian "localhost:8000/" dari URL
+    const cleanedURLWithoutHost = cleanedURL.replace(/^.*\/\/[^\/]+/, '');
+    router.push(cleanedURLWithoutHost);
   }
-};
+}
 
-// Fungsi update status pesanan
-const updateOrderStatus = async (orderId, status) => {
-  try {
-    await fetch(`/api/admin/orders/${orderId}`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ status }),
-    });
-    fetchDashboardData(); // Refresh data setelah update
-  } catch (error) {
-    console.error('Error updating order status:', error);
-  }
-};
+// const getData = async () => {
+//   try{
+//     const getHotel = await axios.get('/master/hotel_image')
+//     hotel.value = getHotel.data.data
+//   } catch (err) {
+//     console.error(err)
+//   } 
+// }
 
-// Fungsi logout
-const logout = () => {
-  // Logika logout
-  console.log('Logout');
-};
-
-// Fetch data saat komponen dimuat
-onMounted(() => {
-  fetchDashboardData();
-});
+// onMounted(() => {
+//   getData()
+// })
 </script>
 
-<style scoped>
-.card {
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+<template>
+  <main>
+    <!-- <div class="card mb-10">
+      <div class="card-body px-6">
+        <div v-if="hotel.length > 0">
+          <Splide :options="carouselOptions" class="shadow-sm bg-body-tertiary rounded">
+            <SplideSlide v-for="(image, index) in hotel" :key="index">
+              <img :src="`/storage/${image.image}`" class="img-fluid w-100 h-100 rounded" alt="Hotel Image">
+            </SplideSlide>
+          </Splide>
+        </div>
+      </div>
+    </div> -->
+
+
+    <div class="card mb-5">
+      <div
+        class="card-header rounded bgi-no-repeat bgi-size-cover bgi-position-y-top bgi-position-x-center align-items-start h-200px bg-primary">
+        <h3 class="card-title align-items-start flex-column text-white pt-10">
+          <span class="fw-bold fs-2x cursor">Navigation</span>
+        </h3>
+      </div>
+      <div class="card-body mt-n20">
+        <div class="mt-n20 position-relative">
+          <div class="row g-3 g-lg-6">
+            
+            <div class="col-xl-4 col-sm-6">
+              <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 border-success border-left-5 border-start d-block">
+                <div class="symbol symbol-30px me-5 mb-8">
+                  <span class="symbol-label">
+                    <i class="ki-duotone ki-code fs-2x text-success">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                      <span class="path3"></span>
+                      <span class="path4"></span>
+                    </i>
+                  </span>
+                </div>
+                <div class="m-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-success fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1 cursor">
+                    Profil Toko
+                    </span>
+                    <span class="text-gray-500 fw-semibold fs-6 cursor">Siapkan profil toko anda</span>
+                  </div>
+                  <router-link to="/dashboard/profile">
+                    <i class="fa fa-chevron-right text-success fs-2"></i>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+
+            <div class="col-xl-4 col-sm-6">
+              <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 border-warning border-left-5 border-start d-block">
+                <div class="symbol symbol-30px me-5 mb-8">
+                  <span class="symbol-label">
+                    <i class="ki-duotone ki-gear fs-2x text-warning">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <div class="m-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-warning fw-bolder cursor d-block fs-2qx lh-1 ls-n1 mb-1">
+                    Pesanan
+                    </span>
+                    <span class="text-gray-500 fw-semibold cursor fs-6">Data pesanan</span>
+                  </div>
+                  <router-link to="/dashboard/master/pesanan">
+                    <i class="fa fa-chevron-right text-warning fs-2"></i>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+
+            <div v-if="local" class="col-xl-4 col-sm-6">
+              <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 border-info border-left-5 border-start d-block">
+                <div class="symbol symbol-30px me-5 mb-8">
+                  <span class="symbol-label">
+                    <i class="ki-duotone ki-send fs-2x text-info">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <div class="m-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-info fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1 cursor">
+                    Continue Booking
+                    </span>
+                    <span class="text-gray-500 fw-semibold fs-6 cursor">go to booking page</span>
+                  </div>
+                  <i class="fa fa-chevron-right text-info fs-2 pointer" @click="butt"></i>
+                </div>
+              </div>
+            </div>
+            <div v-else class="col-xl-4 col-sm-6">
+              <div class="bg-gray-100 bg-opacity-70 rounded-2 px-6 py-5 border-info border-left-5 border-start d-block">
+                <div class="symbol symbol-30px me-5 mb-8">
+                  <span class="symbol-label">
+                    <i class="ki-duotone ki-send fs-2x text-info">
+                      <span class="path1"></span>
+                      <span class="path2"></span>
+                    </i>
+                  </span>
+                </div>
+                <div class="m-0 d-flex justify-content-between align-items-center">
+                  <div>
+                    <span class="text-info fw-bolder d-block fs-2qx lh-1 ls-n1 mb-1 cursor">
+                    Layanan
+                    </span>
+                    <span class="text-gray-500 fw-semibold fs-6 cursor">Tambah layanan</span>
+                  </div>
+                  <router-link to="/dashboard/master/layanan">
+                    <i class="fa fa-chevron-right text-info fs-2"></i>
+                  </router-link>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- <div class="form card mb-10">
+      <div class="card-header align-items-center">
+        <h2 class="mb-0">Dashboard Navigation</h2>
+      </div>
+      <div v-if="local" class="card-body">
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-10 py-5 bg-secondary">
+          <input type="hidden">
+          <button class="text-black w-100 btn" @click="butt">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Continue Booking</div>
+            </div>
+          </button>
+          </input>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-10 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/landing/page">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Landing Page</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-10 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/users">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">User</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Users - User</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/users/roles">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Role</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Users - Role</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/banner">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Banner</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Banner</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/brand">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Brand</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Brand</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/provinsi">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Province</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Province</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/kota">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">City</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - City</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/destinasi">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Destination</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Destination</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/hotel_facility">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Hotel Facility</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Hotel Facility</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/room_facility">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Room Facility</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Room Fasilitas</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/hotel">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Hotel</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Hotel</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/master/article">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Article</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Master - Article</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/promo">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Promo</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Website - Promo</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/promotion">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Promotion</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Website - Promotion</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/booking">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Booking</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Website - Booking</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+        <div class="max-w-xs rounded overflow-hidden shadow-lg mt-15 py-5 bg-secondary">
+          <input type="hidden">
+          <router-link class="text-black" to="/admin/dashboard/setting">
+            <div class="px-10 py-7">
+              <div class="fs-2 fw-bold text-center text-body">Setting</div>
+              <div class="text-base fw-medium pt-4 text-center text-body">Dashboard - Website - Setting</div>
+            </div>
+          </router-link>
+          </input>
+        </div>
+      </div>
+    </div> -->
+  </main>
+</template>
+
+<style>
+.pointer{
+  cursor: pointer;
 }
-.table {
-  border: 1px solid #dee2e6;
+
+.cursor{
+  cursor: default;
 }
 </style>
