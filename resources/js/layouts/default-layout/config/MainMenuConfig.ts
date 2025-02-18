@@ -37,7 +37,7 @@ const MainMenuConfig: Array<MenuItem> = [
                             },
                             {
                                 heading: "User",
-                                name: "master-user",
+                                name: "master-users",
                                 route: "/dashboard/master/users",
                             },
                         ],
@@ -58,23 +58,44 @@ const MainMenuConfig: Array<MenuItem> = [
                         route: "/dashboard/master/toko",
                     },
                     {
-                        heading: "Layanan",
-                        name: "master-layanan",
-                        route: "/dashboard/master/layanan",
+                        heading: "Data Layanan",
+                        name: "master-datalayanan",
+                        route: "/dashboard/master/datalayanan",
                     },
+
                     {
-                        heading: "Pesanan",
-                        name: "master-pesanan",
-                        route: "/dashboard/master/pesanan",
+                        heading: "Data Pesanan",
+                        name: "master-datapesanan",
+                        route: "/dashboard/master/datapesanan",
                     },
                     {
                         heading: "Referensi Layanan",
                         name: "master-referensi-layanan",
                         route: "/dashboard/master/referensi/layanan",
                     },
+                ],
+            },
+
+            //MITRA
+            {
+                sectionTitle: "Mitra",
+                route: "/mitra",
+                keenthemesIcon: "cube-3",
+                name: "mitra",
+                sub: [
+                    {
+                        heading: "Pesanan",
+                        name: "mitra-pesanan",
+                        route: "/dashboard/master/pesanan",
+                    },
+                    {
+                        heading: "Layanan",
+                        name: "mitra-layanan",
+                        route: "/dashboard/master/layanan",
+                    },
                     {
                         heading: "Request Layanan",
-                        name: "master-request-layanan",
+                        name: "mitra-request-layanan",
                         route: "/dashboard/master/request/layanan",
                     },
                 ],

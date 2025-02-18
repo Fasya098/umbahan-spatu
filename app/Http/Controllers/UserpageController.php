@@ -28,11 +28,12 @@ class UserpageController extends Controller
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'alamat' => $request->alamat,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role_id' => 2,
+            'role_id' => 1,
             'status' => '2',
-        ])->assignRole('mitra');
+        ])->assignRole('admin');
 
         // Berikan respon sukses atau redirect ke halaman lain
         return response()->json([

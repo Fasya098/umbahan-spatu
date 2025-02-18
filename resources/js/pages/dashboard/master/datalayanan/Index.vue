@@ -5,10 +5,7 @@ import Form from "./Form.vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { User } from "@/types";
 import { currency } from "@/libs/utils";
-import { useAuthStore } from "@/stores/auth";
 
-const auth = useAuthStore();
-const mitraId = auth.user.id;
 const column = createColumnHelper<User>();
 const paginateRef = ref<any>(null);
 const selected = ref<string>("");
@@ -60,10 +57,6 @@ const columns = [
     }),
 ];
 
-const getApiUrl = () => {
-    return mitraId ? `/master/layanan?mitraId=${mitraId}` : '/master/layanan'
-}
-
 const refresh = () => paginateRef.value.refetch();
 
 watch(openForm, (val) => {
@@ -84,7 +77,7 @@ watch(openForm, (val) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Layanan</h2>
+            <h2 class="mb-0">Data Layanan</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -99,7 +92,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-users"
-                :url="getApiUrl()"
+                url="/master/datalayanan"
                 :columns="columns"
             ></paginate>
         </div>

@@ -21,6 +21,8 @@ return new class extends Migration
             $table->string('alamat');
             $table->string('nomor_telepon');
             $table->double('ongkir');
+            $table->string('latitude')->nullable();
+            $table->string('longitude')->nullable();
             $table->timestamps();
         });
     }

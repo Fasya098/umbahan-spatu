@@ -4,11 +4,7 @@ import { useDelete } from "@/libs/hooks";
 import Form from "./Form.vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import type { User } from "@/types";
-import { currency } from "@/libs/utils";
-import { useAuthStore } from "@/stores/auth";
 
-const auth = useAuthStore();
-const mitraId = auth.user.id;
 const column = createColumnHelper<User>();
 const paginateRef = ref<any>(null);
 const selected = ref<string>("");
@@ -23,16 +19,34 @@ const columns = [
         header: "#",
     }),
     column.accessor("user.name", {
-        header: "Nama",
+        header: "Customer",
     }),
-    column.accessor("referensi_layanan.nama_layanan", {
-        header: "Nama Layanan",
+    column.accessor("toko.nama_toko", {
+        header: "Toko",
     }),
-    column.accessor("harga", {
-        header: "Harga",
-        cell: (cell) => currency(cell.getValue() ?? 0)
+    column.accessor("layanan.referensi_layanan.nama_layanan", {
+        header: "Layanan",
     }),
-    column.accessor("id", {
+    column.accessor("brand_sepatu", {
+        header: "Brand sepatu",
+    }),
+    column.accessor("warna_sepatu", {
+        header: "Warna sepatu",
+    }),
+    column.accessor("tanggal_pesanan", {
+        header: "Tanggal memesan",
+    }),
+    column.accessor("status", {
+        header: "Status",
+    }),
+    column.accessor("total_harga", {
+        header: "Total harga",
+    }),
+    column.accessor("foto_sepatu", {
+        header: "Foto sepatu",
+        cell: cell => h ('img', {src: `/storage/${cell.getValue()}`,width : 100})
+    }),
+    column.accessor("uuid", {
         header: "Aksi",
         cell: (cell) =>
             h("div", { class: "d-flex gap-2" }, [
@@ -45,24 +59,20 @@ const columns = [
                             openForm.value = true;
                         },
                     },
-                    h("i", { class: "la la-pencil fs-2" })
+                    "Lihat foto"
                 ),
                 h(
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
                         onClick: () =>
-                            deleteUser(`/master/layanan/destroy/${cell.getValue()}`),
+                            deleteUser(`/pesanan/${cell.getValue()}`),
                     },
                     h("i", { class: "la la-trash fs-2" })
                 ),
             ]),
     }),
 ];
-
-const getApiUrl = () => {
-    return mitraId ? `/master/layanan?mitraId=${mitraId}` : '/master/layanan'
-}
 
 const refresh = () => paginateRef.value.refetch();
 
@@ -84,7 +94,7 @@ watch(openForm, (val) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Layanan</h2>
+            <h2 class="mb-0">List Pesanan</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -99,7 +109,7 @@ watch(openForm, (val) => {
             <paginate
                 ref="paginateRef"
                 id="table-users"
-                :url="getApiUrl()"
+                url="/pesanan/datapesanan"
                 :columns="columns"
             ></paginate>
         </div>

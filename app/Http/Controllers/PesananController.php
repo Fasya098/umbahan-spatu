@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Http;
 
 class PesananController extends Controller
 {
@@ -19,14 +20,66 @@ class PesananController extends Controller
         $page = $request->page ? $request->page - 1 : 0;
 
         DB::statement('set @no=0+' . $page * $per);
-        $data = Pesanan::with(['user', 'toko', 'layanan.ReferensiLayanan'])->when($request->search, function (Builder $query, string $search) {
-                $query->where('name', 'like', "%$search%")
-                    ->orWhere('email', 'like', "%$search%")
-                    ->orWhere('phone', 'like', "%$search%");
-            })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+        $data = Pesanan::with(['user', 'toko', 'layanan.ReferensiLayanan'])
+            ->when($request->toko_id, function (Builder $query, $tokoId) {
+                $query->where('toko_id', $tokoId);
+            })
+            ->when($request->search, function (Builder $query, string $search) {
+                $query->whereHas('user', function (Builder $q) use ($search) {
+                    $q->where('name', 'like', "%$search%");
+                });
+            })
+            ->latest()
+            ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
 
         return response()->json($data);
     }
+
+    public function dataPesanan(Request $request)
+    {
+        $per = $request->per ?? 10;
+        $page = $request->page ? $request->page - 1 : 0;
+
+        DB::statement('set @no=0+' . $page * $per);
+        $data = Pesanan::with(['user', 'toko', 'layanan.ReferensiLayanan'])->when($request->search, function (Builder $query, string $search) {
+            $query->where('name', 'like', "%$search%")
+                ->orWhere('email', 'like', "%$search%")
+                ->orWhere('phone', 'like', "%$search%");
+        })->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
+        return response()->json($data);
+    }
+
+    //     public function ahay($id, Request $request)
+    // {
+    //     try {
+    //         $per = $request->per ?? 10;
+    //         $page = $request->page ? $request->page - 1 : 0;
+
+    //         DB::statement('set @no=0+' . $page * $per);
+
+    //         $pesanan = Pesanan::with([
+    //                 'user',
+    //                 'toko',
+    //                 'layanan.ReferensiLayanan'
+    //             ])
+    //             ->where('toko_id', $id)
+    //             ->latest()
+    //             ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
+    //         return response()->json([
+    //             'success' => true,
+    //             'data' => $pesanan
+    //         ]);
+    //     } catch (\Exception $e) {
+    //         return response()->json([
+    //             'success' => false,
+    //             'message' => 'Terjadi kesalahan saat mengambil data pesanan.',
+    //             'error' => $e->getMessage()
+    //         ], 500);
+    //     }
+    // }
 
     public function store(Request $request)
     {
@@ -116,6 +169,188 @@ class PesananController extends Controller
             'success' => true,
             'data' => $data,
             'total_pesanan' => $totalPesanan,
+        ]);
+    }
+
+    public function destroy($uuid)
+    {
+        $base = Pesanan::findByUuid($uuid);
+        if ($base) {
+            $base->delete();
+            return response()->json([
+                'message' => "Data successfully deleted",
+                'code' => 200
+            ]);
+        } else {
+            return response([
+                'message' => "Failed delete data $uuid / data doesn't exists"
+            ]);
+        }
+    }
+
+    public function terima($uuid)
+    {
+        // Ambil pesanan dengan relasi user
+        $pesanan = Pesanan::with('user')->where('uuid', $uuid)->firstOrFail();
+
+        // Pastikan user ada
+        if (!$pesanan->user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan untuk pesanan ini',
+            ], 404);
+        }
+
+        // Ubah status pesanan menjadi diterima (2)
+        $pesanan->status = 2;
+        $pesanan->update();
+
+        // Kirim email ke user
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            "Content-Type" => "application/json"
+        ])->post('https://api.brevo.com/v3/smtp/email', [
+            "sender" => [
+                "name" => env('SENDINBLUE_SENDER_NAME'),
+                "email" => env('SENDINBLUE_SENDER_EMAIL'),
+            ],
+            'to' => [
+                ['email' => $pesanan->user->email]
+            ],
+            "subject" => "FreshFT.Clean - Sepatu Sedang Dijemput",
+            "htmlContent" => "
+                <div style='font-family: Arial, sans-serif; text-align: center; padding: 20px;'>
+                    <h2 style='color: #333;'>Pesanan Anda Diterima</h2>
+                    <p style='font-size: 16px; color: #555;'>
+                        Sepatu Anda sedang dalam proses penjemputan. Harap siapkan sepatu Anda untuk diambil oleh kurir kami.
+                    </p>
+                    <div style='display: inline-block; background: #f4f4f4; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; margin: 10px 0;'>
+                        Terima kasih telah menggunakan layanan kami!
+                    </div>
+                    <p style='font-size: 14px; color: #777;'>
+                        Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi tim kami.
+                    </p>
+                    <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
+                    <p style='font-size: 12px; color: #999;'>
+                        FreshFT.Clean - Layanan cuci sepatu terbaik untuk Anda.
+                    </p>
+                </div>
+            "
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pesanan diterima dan email telah dikirim ke pelanggan',
+            'data' => $pesanan,
+        ]);
+    }
+
+    public function tolak($uuid)
+    {
+        // Ambil pesanan dengan relasi user
+        $pesanan = Pesanan::with('user')->where('uuid', $uuid)->firstOrFail();
+
+        // Pastikan user ada
+        if (!$pesanan->user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan untuk pesanan ini',
+            ], 404);
+        }
+
+        $pesanan->delete();
+
+        // Kirim email ke user
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            "Content-Type" => "application/json"
+        ])->post('https://api.brevo.com/v3/smtp/email', [
+            "sender" => [
+                "name" => env('SENDINBLUE_SENDER_NAME'),
+                "email" => env('SENDINBLUE_SENDER_EMAIL'),
+            ],
+            'to' => [
+                ['email' => $pesanan->user->email]
+            ],
+            "subject" => "FreshFT.Clean - Data sepatu tidak valid",
+            "htmlContent" => "
+                <div style='font-family: Arial, sans-serif; text-align: center; padding: 20px;'>
+                    <h2 style='color: #333;'>Pesanan Anda Ditolak</h2>
+                    <p style='font-size: 16px; color: #555;'>
+                        Data pesanan tidak valid. Harap melakukan pemesanan lagi.
+                    </p>
+                    <div style='display: inline-block; background: #f4f4f4; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; margin: 10px 0;'>
+                        Terima kasih telah menggunakan layanan kami!
+                    </div>
+                    <p style='font-size: 14px; color: #777;'>
+                        Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi tim kami.
+                    </p>
+                    <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
+                    <p style='font-size: 12px; color: #999;'>
+                        FreshFT.Clean - Layanan cuci sepatu terbaik untuk Anda.
+                    </p>
+                </div>
+            "
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pesanan ditolak dan email telah dikirim ke pelanggan',
+            'data' => $pesanan,
+        ]);
+    }
+
+    public function kirim($uuid)
+    {
+        $pesanan = Pesanan::with('user')->where('uuid', $uuid)->firstOrFail();
+
+        // Pastikan user ada
+        if (!$pesanan->user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'User tidak ditemukan untuk pesanan ini',
+            ], 404);
+        }
+
+        $pesanan->status = 3;
+        $pesanan->update();
+
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            "Content-Type" => "application/json"
+        ])->post('https://api.brevo.com/v3/smtp/email', [
+            "sender" => [
+                "name" => env('SENDINBLUE_SENDER_NAME'),
+                "email" => env('SENDINBLUE_SENDER_EMAIL'),
+            ],
+            'to' => [
+                ['email' => $pesanan->user->email]
+            ],
+            "subject" => "FreshFT.Clean - Sepatu Sedang Diantar",
+            "htmlContent" => "
+                <div style='font-family: Arial, sans-serif; text-align: center; padding: 20px;'>
+                    <h2 style='color: #333;'>Pesanan Anda Diantar</h2>
+                    <p style='font-size: 16px; color: #555;'>
+                        Sepatu Anda sedang dalam proses pengantaran. Harap bersiap untuk menerima pesanan dari kurir kami.
+                    </p>
+                    <div style='display: inline-block; background: #f4f4f4; padding: 10px 20px; font-size: 18px; font-weight: bold; border-radius: 5px; margin: 10px 0;'>
+                        Terima kasih telah menggunakan layanan kami!
+                    </div>
+                    <p style='font-size: 14px; color: #777;'>
+                        Jika Anda memiliki pertanyaan, jangan ragu untuk menghubungi tim kami.
+                    </p>
+                    <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
+                    <p style='font-size: 12px; color: #999;'>
+                        FreshFT.Clean - Layanan cuci sepatu terbaik untuk Anda.
+                    </p>
+                </div>
+            "
+        ]);
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Pesanan sedang Diantar dan email telah dikirim ke pelanggan',
+            'data' => $pesanan,
         ]);
     }
 }

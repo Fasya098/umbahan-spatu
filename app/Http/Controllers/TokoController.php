@@ -47,19 +47,21 @@ class TokoController extends Controller
         $data['foto_toko'] = str_replace('public/', '', $request->file('foto_toko')->store('public/toko'));
 
         // Cek apakah data Toko sudah ada
-        $toko = Toko::first(); // Anda bisa mengganti dengan kondisi lain jika ingin
+        $toko = Toko::where('user_id', $data['user_id'])->first();
 
         if ($toko) {
             // Jika toko sudah ada, update data toko
             $toko->update($data);
+            $message = 'Data toko berhasil diupdate';
         } else {
             // Jika toko belum ada, buat data toko baru
             $toko = Toko::create($data);
+            $message = 'Data toko berhasil dibuat';
         }
 
         return response()->json([
             'status' => true,
-            'message' => 'telah disimpan',
+            'message' => $message,
             'data' => $toko
         ]);
     }

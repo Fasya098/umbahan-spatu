@@ -29,9 +29,9 @@ for (let i = new Date().getFullYear(); i >= new Date().getFullYear() - 2; i--) {
     <!--begin::Navbar-->
     <div class="app-navbar flex-shrink-0">
         <!--begin::Theme mode-->
-        <div class="app-navbar-item">
+        <!-- <div class="app-navbar-item">
             <select2 class="form-select-solid w-125px" :options="tahuns" v-model="tahun.tahun"></select2>
-        </div>
+        </div> -->
         <!--end::Theme mode-->
 
         <!--begin::Theme mode-->

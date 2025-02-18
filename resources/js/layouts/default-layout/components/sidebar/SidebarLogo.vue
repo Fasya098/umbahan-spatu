@@ -67,7 +67,7 @@ onMounted(() => {
         </div>
         <!--end::Sidebar toggle-->
         <div class="mx-12" style="color: white; font-family: 'Times New Roman', Times, serif; font-size: medium;">
-            UMBAHAN-SPATU
+            FreshFT.Clean
         </div>
     </div>
     <!--end::Logo-->

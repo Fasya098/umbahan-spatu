@@ -71,24 +71,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::post('pesanan', [PesananController::class, 'index']);
             Route::post('pesanan/store', [PesananController::class, 'store']);
             Route::get('pesanan/edit/{uuid}', [PesananController::class, 'edit']);
-        });
-
-        Route::middleware('can:master-toko')->group(function () {
-            Route::post('/toko', [TokoController::class, 'index']);
-            Route::get('/toko/get', [TokoController::class, 'show']);
-            Route::post('/toko/store', [TokoController::class, 'add']);
-            Route::get('/toko/edit/{id}', [TokoController::class, 'edit']);
-            Route::put('/toko/update{id}', [TokoController::class, 'update']);
-            Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']);
-        });
-
-        Route::middleware('can:master-layanan')->group(function () {
-            Route::post('/layanan', [LayananController::class, 'index']);
-            Route::get('/layanan/get', [LayananController::class, 'get']);
-            Route::post('/layanan/store', [LayananController::class, 'store']);
-            Route::get('/layanan/edit/{id}', [LayananController::class, 'edit']);
-            Route::put('/layanan/update/{id}', [LayananController::class, 'update']);
-            Route::delete('/layanan/destroy/{id}', [LayananController::class, 'destroy']);
+            Route::delete('pesanan/destroy/{uuid}', [PesananController::class, 'destroy']);
+            Route::delete('pesanan/tolak/{uuid}', [PesananController::class, 'tolak']);
+            Route::post('pesanan/terima/{uuid}', [PesananController::class, 'terima']);
+            Route::post('pesanan/kirim/{uuid}', [PesananController::class, 'kirim']);
         });
 
         Route::middleware('can:master-promo')->group(function () {
@@ -115,16 +101,37 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::put('/referensi/layanan/update/{id}', [ReferensiLayananController::class, 'update']);
             Route::delete('/referensi/layanan/destroy/{id}', [ReferensiLayananController::class, 'destroy']);
         });
-        Route::middleware('can:master-request-layanan')->group(function () {
-            Route::post('request/layanan', [RequestLayananController::class, 'index']);
-            Route::get('/request/layanan/get', [RequestLayananController::class, 'get']);
-            Route::post('/request/layanan/store', [RequestLayananController::class, 'store']);
-            Route::get('/request/layanan/edit/{id}', [RequestLayananController::class, 'edit']);
-            Route::put('/request/layanan/update/{id}', [RequestLayananController::class, 'update']);
-            Route::delete('/request/layanan/destroy/{id}', [RequestLayananController::class, 'destroy']);
-        });
     });
 });
+
+Route::prefix('master')->group(function () {
+    Route::post('/layanan', [LayananController::class, 'index']);
+    Route::post('/datalayanan', [LayananController::class, 'dataLayanan']);
+    Route::get('/layanan/get', [LayananController::class, 'get']);
+    Route::post('/layanan/store', [LayananController::class, 'store']);
+    Route::get('/layanan/edit/{id}', [LayananController::class, 'edit']);
+    Route::put('/layanan/update/{id}', [LayananController::class, 'update']);
+    Route::delete('/layanan/destroy/{id}', [LayananController::class, 'destroy']);
+});
+
+Route::prefix('master')->group(function () {
+    Route::post('request/layanan', [RequestLayananController::class, 'index']);
+    Route::get('/request/layanan/get', [RequestLayananController::class, 'get']);
+    Route::post('/request/layanan/store', [RequestLayananController::class, 'store']);
+    Route::get('/request/layanan/edit/{id}', [RequestLayananController::class, 'edit']);
+    Route::put('/request/layanan/update/{id}', [RequestLayananController::class, 'update']);
+    Route::delete('/request/layanan/destroy/{id}', [RequestLayananController::class, 'destroy']);
+});
+
+Route::prefix('master')->group(function () {
+    Route::post('/toko', [TokoController::class, 'index']);
+    Route::get('/toko/get', [TokoController::class, 'show']);
+    Route::post('/toko/store', [TokoController::class, 'add']);
+    Route::get('/toko/edit/{id}', [TokoController::class, 'edit']);
+    Route::put('/toko/update{id}', [TokoController::class, 'update']);
+    Route::delete('/toko/destroy/{id}', [TokoController::class, 'destroy']);
+});
+
 
 Route::prefix('userpage')->group(function () {
     Route::post('/store', [UserpageController::class, 'store']);
@@ -140,8 +147,10 @@ Route::prefix('userpage')->group(function () {
 
 Route::prefix('pesanan')->group(function () {
     Route::post('', [PesananController::class, 'index']);
+    Route::post('/datapesanan', [PesananController::class, 'dataPesanan']);
     Route::post('/store', [PesananController::class, 'store']);
     Route::get('/get/{id}', [PesananController::class, 'get']);
+    // Route::post('/index/{id}', [PesananController::class, 'ahay']);
     Route::get('/proses/{id}', [PesananController::class, 'proses']);
     Route::get('/selesai/{id}', [PesananController::class, 'selesai']);
 });

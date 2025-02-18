@@ -20,6 +20,8 @@ class Toko extends Model
         'alamat',
         'nomor_telepon',
         'ongkir',
+        'latitude',
+        'longitude',
     ];
 
     public function user () {

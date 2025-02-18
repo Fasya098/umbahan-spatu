@@ -4,15 +4,15 @@
         <!--begin::Heading-->
         <div class="text-center mb-10">
             <router-link to="/">
-                <img :src="setting?.logo" :alt="setting?.app" class="w-200px mb-8" />
+                <img :src="setting?.logo" :alt="setting?.app" style="width: 130px;" class="" />
             </router-link>
             <!--begin::Title-->
-            <h1 class="mb-3">
-                Masuk ke <span class="text-primary">{{ setting?.app }}</span>
-            </h1>
             <!--end::Title-->
         </div>
         <!--begin::Heading-->
+        <h1 class="text-center">
+            Masuk ke <span class="text-primary">{{ setting?.app }}</span>
+        </h1>
 
         <ul class="nav nav-tabs nav-line-tabs mb-5 fs-6">
             <li class="nav-item">

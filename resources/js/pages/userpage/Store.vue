@@ -140,7 +140,6 @@ onMounted(() => {
             <div class="company-info">
                 <img src="/media/logo-spatu-nobackground.png" alt="Logo Perusahaan" class="company-logo">
                 <h2 class="text-white">Cuci Sepatu Bersih</h2>
-                <p>Jl. Contoh No. 123, Kota Anda</p>
                 <p>Telp: (021) 1234-5678</p>
                 <p>Email: info@cucisepatubersih.com</p>
             </div>
@@ -165,7 +164,7 @@ onMounted(() => {
 }
 
 .company-logo {
-    width: 100px;
+    width: 85px;
     height: auto;
     margin-bottom: 1rem;
 }

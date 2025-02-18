@@ -50,6 +50,20 @@ function getEdit() {
         });
 }
 
+const getLocation = () => {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition((position) => {
+            users.value.latitude = position.coords.latitude;
+            users.value.longitude = position.coords.longitude;
+        }, () => {
+            toast.error("Gagal mendapatkan lokasi");
+        });
+    } else {
+        toast.error("Geolocation tidak didukung di browser ini");
+    }
+};
+
+
 function submit() {
     const formData = new FormData();
     formData.append("nama_toko", users.value.nama_toko);
@@ -58,6 +72,8 @@ function submit() {
     formData.append("alamat", users.value.alamat);
     formData.append("nomor_telepon", users.value.nomor_telepon);
     formData.append("ongkir", users.value.ongkir);
+    formData.append("latitude", users.value.latitude);
+    formData.append("longitude", users.value.longitude);
 
     // if (user.value?.password) {
     //     formData.append("password", user.value.password);
@@ -175,6 +191,36 @@ watch(
                     </div>
                     <!--end::Input group-->
                 </div>
+                <div class="col-md-4">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6">Latitude</label>
+                        <Field class="form-control form-control-lg form-control-solid" type="text" name="latitude"
+                            autocomplete="off" v-model="users.latitude" placeholder="Masukkan latitude" />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="latitude" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6">Longitude</label>
+                        <Field class="form-control form-control-lg form-control-solid" type="text" name="longitude"
+                            autocomplete="off" v-model="users.longitude" placeholder="Masukkan longitude" />
+                        <div class="fv-plugins-message-container">
+                            <div class="fv-help-block">
+                                <ErrorMessage name="longitude" />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 d-flex align-items-center">
+                    <button type="button" class="btn btn-primary mt-1" @click="getLocation">
+                        Ambil Lokasi Toko
+                    </button>
+                </div>
+
                 <div class="col-md-6">
                     <!--begin::Input group-->
                     <div class="fv-row mb-7">

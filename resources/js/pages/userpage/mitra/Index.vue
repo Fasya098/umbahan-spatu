@@ -90,6 +90,7 @@ const showConfirmPassword = ref(false);
 const form = reactive({
   name: '',
   email: '',
+  alamat: '',
   phone: '',
   password: '',
   password_confirmation: '',

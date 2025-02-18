@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\Storage;
 
 class LayananController extends Controller
 {
-    public function index(Request $request)
+    public function dataLayanan(Request $request)
     {
         $per = $request->per ?? 10;
         $page = $request->page ? $request->page - 1 : 0;
@@ -24,12 +24,36 @@ class LayananController extends Controller
             $query->where('nama_layanan', 'like', "%$search%")
                 ->orWhere('harga', 'like', "%$search%");
         })
-        ->with(['user', 'referensiLayanan'])
-        ->latest()
-        ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+            ->with(['user', 'referensiLayanan'])
+            ->latest()
+            ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
     }
+
+    public function index(Request $request)
+    {
+        $per = $request->per ?? 10;
+        $page = $request->page ? $request->page - 1 : 0;
+        $mitraId = $request->mitraId; // Ambil mitraId dari request
+
+        DB::statement('set @no=0+' . $page * $per);
+
+        $data = Layanan::with(['user', 'referensiLayanan'])
+            ->where('user_id', $mitraId) // Filter berdasarkan mitraId
+            ->when($request->search, function (Builder $query, string $search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('name', 'like', "%$search%")
+                        ->orWhere('email', 'like', "%$search%")
+                        ->orWhere('phone', 'like', "%$search%");
+                });
+            })
+            ->latest()
+            ->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
+
+        return response()->json($data);
+    }
+
 
     public function store(Request $request)
     {
@@ -54,7 +78,8 @@ class LayananController extends Controller
         ], 201);
     }
 
-    public function get () {
+    public function get()
+    {
         return response()->json(['data' => Layanan::all()]);
     }
 
@@ -99,6 +124,4 @@ class LayananController extends Controller
             ]);
         }
     }
-
-    
 }

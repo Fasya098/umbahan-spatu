@@ -17,8 +17,8 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-            'app' => 'Umbahan-Spatu',
-            'description' =>  'Aplikasi Cuci Sepatu',
+            'app' => 'FreshFT.Clean',
+            'description' =>  'Website Cuci Sepatu',
             'logo' =>  '/media/logo-spatu-nobackground.png',
             'bg_auth' =>  '/media/misc/bg-sepatu.png',
             'banner' =>  '/media/misc/bg-sepatu.png',

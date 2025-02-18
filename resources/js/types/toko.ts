@@ -4,4 +4,6 @@ export interface Toko {
     nama_toko: string;
     alamat: string;
     nomor_telepon: string;
+    latitude: number;
+    longitude: number;
 }

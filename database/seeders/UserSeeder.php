@@ -21,21 +21,21 @@ class UserSeeder extends Seeder
             'phone' => '0812345678',
         ])->assignRole('admin');
 
-        User::create([
-            'name' => 'Mitra',
-            'role_id' => 1,
-            'email' => 'mitra@gmail.com',
-            'password' => bcrypt('12345678'),
-            'phone' => '08123456789',
-        ])->assignRole('admin');
-
         // User::create([
         //     'name' => 'Mitra',
-        //     'role_id' => 2,
+        //     'role_id' => 1,
         //     'email' => 'mitra@gmail.com',
         //     'password' => bcrypt('12345678'),
         //     'phone' => '08123456789',
-        // ])->assignRole('mitra');
+        // ])->assignRole('admin');
+
+        User::create([
+            'name' => 'Mitra',
+            'role_id' => 2,
+            'email' => 'mitra@gmail.com',
+            'password' => bcrypt('12345678'),
+            'phone' => '08123456789',
+        ])->assignRole('mitra');
         
         User::create([
             'name' => 'Customer',
