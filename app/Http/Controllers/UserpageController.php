@@ -31,9 +31,9 @@ class UserpageController extends Controller
             'alamat' => $request->alamat,
             'phone' => $request->phone,
             'password' => Hash::make($request->password),
-            'role_id' => 1,
+            'role_id' => 2,
             'status' => '2',
-        ])->assignRole('admin');
+        ])->assignRole('mitra');
 
         // Berikan respon sukses atau redirect ke halaman lain
         return response()->json([
@@ -168,22 +168,22 @@ class UserpageController extends Controller
     {
         try {
             Log::info('Resend OTP request received', ['email' => $request->email]);
-    
+
             $user = User::where('email', $request->email)
                 ->where('is_verified', false)
                 ->first();
-    
+
             if (!$user) {
                 Log::warning('User not found or already verified', ['email' => $request->email]);
                 return response()->json(['status' => false, 'message' => 'User tidak ditemukan atau sudah terverifikasi'], 422);
             }
-    
+
             Log::info('User ditemukan', ['email' => $user->email, 'otp_code' => $user->otp_code]);
-    
+
             // Jika OTP masih berlaku, kirim ulang OTP ke email user
             if ($user->otp_expired > now()) {
                 Log::info('OTP masih berlaku, mengirim ulang kode OTP', ['otp_code' => $user->otp_code]);
-    
+
                 $response = Http::withHeaders([
                     'api-key' => env('SENDINBLUE_API_KEY'),
                     "Content-Type" => "application/json"
@@ -215,30 +215,30 @@ class UserpageController extends Controller
                     </div>
                 "
                 ]);
-    
+
                 if ($response->failed()) {
                     Log::error('Gagal mengirim email OTP', ['email' => $user->email, 'response' => $response->body()]);
                     return response()->json(['status' => false, 'message' => 'Gagal mengirim email OTP'], 500);
                 }
-    
+
                 Log::info('OTP berhasil dikirim ulang', ['email' => $user->email]);
-    
+
                 return response()->json([
                     'status' => true,
                     'message' => 'Kode OTP masih berlaku, silakan cek email Anda'
                 ], 200);
             }
-    
+
             Log::info('OTP sudah kadaluarsa, membuat OTP baru');
-    
+
             // Generate OTP baru jika sudah kadaluarsa
             $newOtp = rand(100000, 999999);
             $user->otp_code = $newOtp;
             $user->otp_expired = now()->addMinutes(10);
             $user->save();
-    
+
             Log::info('OTP baru berhasil dibuat', ['email' => $user->email, 'new_otp' => $newOtp]);
-    
+
             // Kirim ulang email dengan OTP baru
             $response = Http::withHeaders([
                 'api-key' => env('SENDINBLUE_API_KEY'),
@@ -271,14 +271,14 @@ class UserpageController extends Controller
                 </div>
             "
             ]);
-    
+
             if ($response->failed()) {
                 Log::error('Gagal mengirim email OTP baru', ['email' => $user->email, 'response' => $response->body()]);
                 return response()->json(['status' => false, 'message' => 'Gagal mengirim email OTP baru'], 500);
             }
-    
+
             Log::info('OTP baru berhasil dikirim', ['email' => $user->email, 'otp_code' => $newOtp]);
-    
+
             return response()->json([
                 'status' => true,
                 'message' => 'Kode OTP baru telah dikirim ke email Anda'
@@ -317,5 +317,112 @@ class UserpageController extends Controller
         return response()->json([
             'user' => $user
         ]);
+    }
+
+    public function lupa(Request $request)
+    {
+        // Validasi input email
+        $request->validate([
+            'email' => 'required|email|exists:users,email',
+        ]);
+
+        // Cari user berdasarkan email
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Email tidak ditemukan.',
+            ], 404);
+        }
+
+        // Generate kode OTP 6 digit
+        $otpCode = rand(100000, 999999);
+
+        // Simpan OTP ke database dengan waktu kedaluwarsa 10 menit
+        $user->otp_code = $otpCode;
+        $user->otp_expired = Carbon::now()->addMinutes(10);
+        $user->save();
+
+        // Kirim email OTP
+        $response = Http::withHeaders([
+            'api-key' => env('SENDINBLUE_API_KEY'),
+            "Content-Type" => "application/json"
+        ])->post('https://api.brevo.com/v3/smtp/email', [
+            "sender" => [
+                "name" => env('SENDINBLUE_SENDER_NAME'),
+                "email" => env('SENDINBLUE_SENDER_EMAIL'),
+            ],
+            'to' => [
+                ['email' => $request->email]
+            ],
+            "subject" => "Kode OTP Verifikasi Akun",
+            "htmlContent" => "
+                <div style='font-family: Arial, sans-serif; text-align: center; padding: 20px;'>
+                    <h2 style='color: #333;'>Verifikasi Akun Anda</h2>
+                    <p style='font-size: 16px; color: #555;'>
+                        Gunakan kode OTP berikut untuk memverifikasi akun Anda:
+                    </p>
+                    <div style='display: inline-block; background: #f4f4f4; padding: 10px 20px; font-size: 24px; font-weight: bold; border-radius: 5px; margin: 10px 0;'>
+                        $otpCode
+                    </div>
+                    <p style='font-size: 14px; color: #777;'>
+                        Kode ini berlaku selama 10 menit. Jangan berikan kode ini kepada siapa pun.
+                    </p>
+                    <hr style='border: none; border-top: 1px solid #ddd; margin: 20px 0;'>
+                    <p style='font-size: 12px; color: #999;'>
+                        Jika Anda tidak merasa melakukan pendaftaran, abaikan email ini.
+                    </p>
+                </div>
+            "
+        ]);
+
+        if ($response->failed()) {
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Gagal mengirim email OTP.',
+            ], 500);
+        }
+
+        return response()->json([
+            'status' => 'success',
+            'message' => 'Kode OTP telah dikirim ke email Anda.',
+        ]);
+    }
+
+    public function checkReset(Request $request)
+    {
+        $user = User::where('email', $request->email)
+            ->where('is_verified', false)
+            ->first();
+
+        return response()->json(['status' => true, 'message' => 'Verifikasi berhasil', 'user' => $user]);
+    }
+
+    public function resetPassword(Request $request)
+    {
+        // Validasi input
+        $validated = $request->validate([
+            'email' => 'required|email|exists:users,email',
+            'password' => 'required|min:8',
+        ]);
+
+        // Cari user berdasarkan email
+        $user = User::where('email', $validated['email'])->first();
+
+        if ($user) {
+            // Update password dengan hash
+            $user->update([
+                'password' => Hash::make($validated['password']),
+            ]);
+
+            return response()->json([
+                'message' => 'Password berhasil direset'
+            ], 200);
+        }
+
+        return response()->json([
+            'message' => 'User tidak ditemukan'
+        ], 404);
     }
 }

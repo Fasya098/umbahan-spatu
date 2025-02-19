@@ -35,17 +35,17 @@ const handleTerima = async (requestNamaLayanan) => {
 
 const handleTolak = async (requestNamaLayanan) => {
     try {
-        const response = await axios.post('/master/users/tolak', {
+        const response = await axios.post('/master/referensi/layanan/tolak', {
             request_nama_layanan: requestNamaLayanan,
         });
         // Menangani response sukses
         console.log(response.data);
-        toast.success('Mitra Ditolak!');
+        toast.success('Layanan Ditolak!');
         refresh();
     } catch (error) {
         // Menangani error
         console.error(error);
-        toast.error('Error menolak mitra');
+        toast.error('Error menolak Layanan');
     }
 };
 
@@ -72,7 +72,7 @@ const columns = [
                     "button",
                     {
                         class: "btn btn-sm btn-icon btn-danger",
-                        onClick: () => handleTolak, // Jika perlu mengirim user_id
+                        onClick: () => handleTolak(cell.row.original.request_nama_layanan), // Jika perlu mengirim user_id
                     },
                     h("i", { class: "la la-times fs-2" })
                 ),
@@ -92,33 +92,18 @@ watch(openForm, (val) => {
 </script>
 
 <template>
-    <Form
-        :selected="selected"
-        @close="openForm = false"
-        v-if="openForm"
-        @refresh="refresh"
-    />
+    <Form :selected="selected" @close="openForm = false" v-if="openForm" @refresh="refresh" />
 
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Terima Layanan</h2>
-            <button
-                type="button"
-                class="btn btn-sm btn-primary ms-auto"
-                v-if="!openForm"
-                @click="openForm = true"
-            >
+            <button type="button" class="btn btn-sm btn-primary ms-auto" v-if="!openForm" @click="openForm = true">
                 Tambah
                 <i class="la la-plus"></i>
             </button>
         </div>
         <div class="card-body">
-            <paginate
-                ref="paginateRef"
-                id="table-users"
-                url="/master/request/layanan"
-                :columns="columns"
-            ></paginate>
+            <paginate ref="paginateRef" id="table-users" url="/master/request/layanan" :columns="columns"></paginate>
         </div>
     </div>
 </template>

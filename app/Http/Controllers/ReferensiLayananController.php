@@ -12,6 +12,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+
 class ReferensiLayananController extends Controller
 {
     public function index(Request $request)
@@ -47,7 +48,8 @@ class ReferensiLayananController extends Controller
         ], 201);
     }
 
-    public function get () {
+    public function get()
+    {
         return response()->json(['data' => ReferensiLayanan::all()]);
     }
 
@@ -69,7 +71,7 @@ class ReferensiLayananController extends Controller
 
     public function edit($id)
     {
-        $ReferensiLayanan =ReferensiLayanan::find($id);
+        $ReferensiLayanan = ReferensiLayanan::find($id);
         return response()->json([
             'success' => true,
             'data' => $ReferensiLayanan
@@ -98,19 +100,35 @@ class ReferensiLayananController extends Controller
         $validatedData = $request->validate([
             'request_nama_layanan' => 'required|string',
         ]);
-    
+
         // Membuat data baru di ReferensiLayanan
         $layanan = ReferensiLayanan::create([
             'nama_layanan' => $validatedData['request_nama_layanan'],
         ]);
-    
+
         // Mencari dan menghapus data pada RequestLayanan yang memiliki nama layanan yang diterima
         $requestLayanan = RequestLayanan::where('request_nama_layanan', $validatedData['request_nama_layanan'])->first();
-    
+
         if ($requestLayanan) {
             $requestLayanan->delete();
         }
-    
+
         return response()->json(['message' => 'Layanan diterima dan data request dihapus', 'data' => $layanan], 200);
+    }
+
+    public function tolak(Request $request)
+    {
+        $validatedData = $request->validate([
+            'request_nama_layanan' => 'required|string',
+        ]);
+
+        $requestLayanan = RequestLayanan::where('request_nama_layanan', $validatedData['request_nama_layanan'])->first();
+        if ($requestLayanan) {
+            $requestLayanan->delete();
+        }
+
+        return response()->json([
+            'status' => 'success'
+        ]);
     }
 }

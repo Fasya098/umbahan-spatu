@@ -185,6 +185,16 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/userpage/register/Index.vue"),
     },
     {
+        path: "/cek-pesanan",
+        name: "/cek-pesanan",
+        component: () => import("@/pages/userpage/cekpesanan/Index.vue"),
+    },
+    {
+        path: "/lupa-password",
+        name: "/lupa-password",
+        component: () => import("@/pages/userpage/lupa/Index.vue"),
+    },
+    {
         path: "/login",
         name: "/login",
         component: () => import("@/pages/auth/sign-in/user/Login.vue"),

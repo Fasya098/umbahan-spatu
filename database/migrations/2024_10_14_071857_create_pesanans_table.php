@@ -20,6 +20,7 @@ return new class extends Migration
             $table->string('foto_sepatu')->nullable();
             $table->string('brand_sepatu')->nullable();
             $table->string('warna_sepatu')->nullable();
+            $table->string('kode_pesanan')->nullable();
             $table->date('tanggal_pesanan')->nullable();
             $table->enum('status', ['1', '2', '3'])->nullable()->comment('1=Penjemputan, 2=Pengerjaan, 3=pengiriman');
             $table->double('total_harga')->nullable();

@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Str;
 
 class PesananController extends Controller
 {
@@ -85,6 +86,7 @@ class PesananController extends Controller
     {
         try {
             $date = Carbon::now()->toDateString();
+            $kode = Str::upper(Str::random(8));
 
             foreach ($request->input('inputs') as $index => $input) {
                 $foto_sepatu = null;
@@ -103,6 +105,7 @@ class PesananController extends Controller
                     'warna_sepatu' => $input['warna_sepatu'],
                     'layanan_id' => $input['layanan_id'],
                     'total_harga' => $input['total_harga'],
+                    'kode_pesanan' => $kode,
                     'status' => 1,
                 ]);
             }
@@ -201,9 +204,13 @@ class PesananController extends Controller
             ], 404);
         }
 
+        $pesananSemua = Pesanan::where('kode_pesanan', $pesanan->kode_pesanan)->get();
+
         // Ubah status pesanan menjadi diterima (2)
-        $pesanan->status = 2;
-        $pesanan->update();
+        foreach ($pesananSemua as $p) {
+            $p->status = 2;
+            $p->update();
+        }
 
         // Kirim email ke user
         $response = Http::withHeaders([
@@ -258,7 +265,11 @@ class PesananController extends Controller
             ], 404);
         }
 
-        $pesanan->delete();
+        $pesananSemua = Pesanan::where('kode_pesanan', $pesanan->kode_pesanan)->get();
+
+        foreach ($pesananSemua as $p) {
+            $p->delete();
+        }
 
         // Kirim email ke user
         $response = Http::withHeaders([
@@ -352,5 +363,42 @@ class PesananController extends Controller
             'message' => 'Pesanan sedang Diantar dan email telah dikirim ke pelanggan',
             'data' => $pesanan,
         ]);
+    }
+
+    public function cekPesanan($kode_pesanan)
+    {
+        // Ambil semua data pesanan berdasarkan kode_pesanan
+        $pesananList = Pesanan::where('kode_pesanan', $kode_pesanan)->get();
+
+        if ($pesananList->isEmpty()) {
+            return response()->json([
+                'message' => 'Pesanan tidak ditemukan'
+            ], 404);
+        }
+
+        // Format data pesanan
+        $pesananData = $pesananList->map(function ($pesanan) {
+            $statusText = match ($pesanan->status) {
+                1 => 'Pesanan dalam proses penjemputan',
+                2 => 'Pesanan sedang diproses',
+                3 => 'Pesanan dalam proses pengiriman',
+                default => 'Status tidak diketahui',
+            };
+
+            return [
+                'user_id' => $pesanan->user_id,
+                'toko_id' => $pesanan->toko_id,
+                'layanan_id' => $pesanan->layanan_id,
+                'foto_sepatu' => $pesanan->foto_sepatu,
+                'brand_sepatu' => $pesanan->brand_sepatu,
+                'warna_sepatu' => $pesanan->warna_sepatu,
+                'tanggal_pesanan' => $pesanan->tanggal_pesanan,
+                'status' => $pesanan->status,
+                'total_harga' => $pesanan->total_harga,
+                'kode_pesanan' => $pesanan->kode_pesanan,
+            ];
+        });
+
+        return response()->json($pesananData);
     }
 }

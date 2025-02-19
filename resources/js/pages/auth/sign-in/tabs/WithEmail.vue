@@ -27,7 +27,7 @@
                 <!--end::Label-->
 
                 <!--begin::Link-->
-                <router-link to="/password-reset" class="link-primary fs-6 fw-bold">
+                <router-link to="/lupa-password" class="link-primary fs-6 fw-bold">
                     Lupa Password ?
                 </router-link>
                 <!--end::Link-->

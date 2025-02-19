@@ -2,36 +2,23 @@
   <div class="shoe-cleaning-website">
     <!-- Navbar -->
     <nav class="navbar">
-      <div class="nav">
-        <div class="navbar-container">
-          <router-link to="/" class="nav-item">Home</router-link>
-          <router-link to="/maps" class="nav-item">Maps</router-link>
-        </div>
-        <div class="search-join-container">
-          <div class="search-location-wrapper">
-            <input type="text" v-model="searchQuery" @input="filterStores" placeholder="Cari nama toko..."
-              class="search-input" />
-            <Button v-if="!userLocation" class="btn btn-location btn-sm" @click="getUserLocation">
-              <span><i style="color: red" class="fa-solid fa-location-dot"></i></span>
-              Gunakan Lokasi Saya
-            </Button>
-          </div>
-          <Button class="btn btn-info btn-sm" @click="navigateToMitra">
-            Bergabung dengan kami
-          </Button>
-        </div>
+      <div class="navbar-container">
+        <router-link to="/userpage" class="nav-item">Home</router-link>
+        <router-link to="/cek-pesanan" class="nav-item">Cek Pesanan</router-link>
+      </div>
+      <div class="navbar-actions">
+        <button v-if="!userLocation" class="btn-join" @click="getUserLocation">Dapatkan lokasi anda</button>
+        <input type="text" v-model="searchQuery" @input="filterStores" placeholder="Cari nama toko..."
+          class="search-input" />
+        <button class="btn-join" @click="navigateToMitra">Bergabung dengan kami</button>
       </div>
     </nav>
-
-    <div v-if="userLocation" class="location-info">
-      <p>Menampilkan toko terdekat dari lokasi Anda</p>
-    </div>
 
     <!-- Content -->
     <main class="content">
       <div class="card-container">
         <div v-if="filteredTokos.length" class="cards-wrapper">
-          <div v-for="toko in filteredTokos" :key="toko.uuid" class="shoe-card">
+          <div v-for="toko in paginatedTokos" :key="toko.uuid" class="shoe-card">
             <img :src="getImageUrl(toko.foto_toko)" alt="Sepatu" class="shoe-image">
             <div class="shoe-info">
               <h3>{{ toko.nama_toko }}</h3>
@@ -44,6 +31,24 @@
           </div>
         </div>
         <p v-else class="loading-text">{{ tokos.length === 0 ? 'Loading data...' : 'Tidak ada toko ditemukan' }}</p>
+
+        <!-- Pagination -->
+        <div v-if="totalPages > 1" class="pagination-container mt-4 flex justify-center gap-2">
+          <button @click="currentPage--" :disabled="currentPage === 1"
+            class="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50">
+            Previous
+          </button>
+          <button v-for="page in totalPages" :key="page" @click="currentPage = page" :class="[
+            'px-4 py-2 rounded-lg',
+            currentPage === page ? 'bg-gray-500' : 'bg-gray-200'
+          ]">
+            {{ page }}
+          </button>
+          <button @click="currentPage++" :disabled="currentPage === totalPages"
+            class="px-4 py-2 bg-gray-200 rounded-lg disabled:opacity-50">
+            Next
+          </button>
+        </div>
       </div>
     </main>
 
@@ -62,7 +67,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import axios from 'axios';
 import { useRouter } from 'vue-router';
 
@@ -70,6 +75,37 @@ const router = useRouter();
 const tokos = ref([]);
 const searchQuery = ref('');
 const userLocation = ref<{ lat: number; lng: number } | null>(null);
+const currentPage = ref(1);
+const itemsPerPage = 12;
+
+// Computed property for total pages
+const totalPages = computed(() =>
+  Math.ceil(filteredTokos.value.length / itemsPerPage)
+);
+
+// Computed property for paginated stores
+const paginatedTokos = computed(() => {
+  const startIndex = (currentPage.value - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  return filteredTokos.value.slice(startIndex, endIndex);
+});
+
+// Watch for changes in search query to reset pagination
+watch(searchQuery, () => {
+  currentPage.value = 1;
+});
+
+const saveLocation = (location: { lat: number; lng: number }) => {
+  localStorage.setItem('userLocation', JSON.stringify(location));
+};
+
+const loadSavedLocation = () => {
+  const savedLocation = localStorage.getItem('userLocation');
+  if (savedLocation) {
+    userLocation.value = JSON.parse(savedLocation);
+    calculateDistances();
+  }
+};
 
 const filteredTokos = computed(() => {
   if (!searchQuery.value) return tokos.value;
@@ -86,22 +122,28 @@ const getUserLocation = () => {
     return;
   }
 
-  navigator.geolocation.getCurrentPosition(
-    (position) => {
-      userLocation.value = {
-        lat: position.coords.latitude,
-        lng: position.coords.longitude
-      };
-      calculateDistances();
-    },
-    (error) => {
-      alert("Gagal mendapatkan lokasi: " + error.message);
-    }
-  );
+  if (confirm("Izinkan akses lokasi Anda untuk menampilkan toko terdekat?")) {
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        const location = {
+          lat: position.coords.latitude,
+          lng: position.coords.longitude
+        };
+        userLocation.value = location;
+        saveLocation(location);
+        calculateDistances();
+      },
+      (error) => {
+        alert("Gagal mendapatkan lokasi: " + error.message);
+      }
+    );
+  } else {
+    alert("Anda perlu mengaktifkan lokasi untuk fitur ini.");
+  }
 };
 
 const calculateDistance = (lat1: number, lng1: number, lat2: number, lng2: number): number => {
-  const R = 6371; // Radius bumi dalam km
+  const R = 6371;
   const dLat = (lat2 - lat1) * (Math.PI / 180);
   const dLng = (lng2 - lng1) * (Math.PI / 180);
 
@@ -118,7 +160,12 @@ const calculateDistances = () => {
 
   tokos.value.forEach(toko => {
     if (toko.latitude && toko.longitude) {
-      toko.jarak = calculateDistance(userLocation.value.lat, userLocation.value.lng, toko.latitude, toko.longitude);
+      toko.jarak = calculateDistance(
+        userLocation.value.lat,
+        userLocation.value.lng,
+        toko.latitude,
+        toko.longitude
+      );
     } else {
       toko.jarak = 0;
     }
@@ -134,8 +181,10 @@ const navigateToMitra = () => {
 const getShoesData = async () => {
   try {
     const response = await axios.get('/userpage/toko/get');
-    console.log(response.data);
     tokos.value = response.data;
+    if (userLocation.value) {
+      calculateDistances();
+    }
   } catch (error) {
     console.error('Error fetching shoes data:', error);
   }
@@ -153,17 +202,47 @@ function navigateToStore(uuid) {
 };
 
 onMounted(() => {
+  loadSavedLocation();
   getShoesData();
+
+  if (!userLocation.value) {
+    getUserLocation();
+  }
 });
 </script>
 
 <style scoped>
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 2rem;
+  gap: 0.5rem;
+}
+
+.pagination-container button {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.2s;
+}
+
+.pagination-container button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.cards-wrapper {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+  padding: 1rem;
+}
+
 .nav {
   display: flex;
   flex-direction: row;
   width: 100%;
   justify-content: space-between;
-  /* background-color: red; */
 }
 
 .shoe-cleaning-website {
@@ -171,21 +250,65 @@ onMounted(() => {
 }
 
 .navbar {
-  background-color: #333;
-  padding: 2rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #222;
+  padding: 1rem 2rem;
   width: 100%;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .navbar-container {
   display: flex;
-  flex-direction: row;
-  justify-content: center;
+  align-items: center;
+  gap: 1.5rem;
 }
 
 .nav-item {
-  color: white;
   text-decoration: none;
-  margin: 0 1rem;
+  color: white;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.nav-item:hover {
+  color: #00bcd4;
+}
+
+.navbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.search-input {
+  padding: 0.5rem 1rem;
+  border: 1px solid #555;
+  border-radius: 8px;
+  outline: none;
+  background-color: #333;
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  border-color: #00bcd4;
+}
+
+.btn-join {
+  background-color: #00bcd4;
+  color: white;
+  border: none;
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background-color 0.3s ease;
+}
+
+.btn-join:hover {
+  background-color: #0097a7;
 }
 
 .search-location-wrapper {
@@ -196,21 +319,21 @@ onMounted(() => {
 }
 
 .search-join-container {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    justify-content: space-between;
-    margin: 0 auto;
-  }
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  justify-content: space-between;
+  margin: 0 auto;
+}
 
-.search-input {
+/* .search-input {
   padding: 0.5rem 1rem;
   border: 1px solid #ddd;
   border-radius: 4px;
   font-size: 0.95rem;
   width: 200px;
   background-color: white;
-}
+} */
 
 .search-input:focus {
   outline: none;
@@ -237,14 +360,6 @@ onMounted(() => {
   transform: translateY(-1px);
 }
 
-.location-info {
-  /* background-color: #e8f5e9; */
-  color: #2e7d32;
-  text-align: center;
-  /* padding: 0.5rem; */
-  /* margin-bottom: 1rem; */
-}
-
 .content {
   padding: 2rem;
   min-height: 50vh;
@@ -261,7 +376,7 @@ onMounted(() => {
 }
 
 .shoe-card {
-  flex: 0 1 189px;
+  flex: 0 1 185px;
   border: 1px solid #ddd;
   border-radius: 8px;
   overflow: hidden;
